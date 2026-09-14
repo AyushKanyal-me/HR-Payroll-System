@@ -1,4 +1,4 @@
-# PeoplePay360 - Enterprise HR & Payroll Management System
+Enterprise HR & Payroll Management System
 
 PeoplePay360 is an enterprise-grade, multi-tenant Human Resources and Payroll Management platform designed for mid-sized to enterprise organizations. It streamlines core HR workflows, employee lifecycle tracking, attendance and shift scheduling, leave management, automated tax and statutory payroll calculations, payslip generation, and immutable compliance audit logging.
 
