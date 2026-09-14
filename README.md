@@ -282,9 +282,3 @@ npm run test:coverage
 - Input Validation: Strict request validation on all endpoints using Zod schema parsing.
 - Audit Trail: Immutable logging of all sensitive state transitions and administrative operations.
 - Secret Sanitization: Passwords and sensitive tokens are strictly hashed and excluded from API responses and client-side storage.
-
----
-
-## License
-
-This project is licensed under the MIT License.
