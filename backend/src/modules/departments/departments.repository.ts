@@ -1,10 +1,14 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import { Department, CreateDepartmentDto, UpdateDepartmentDto, DepartmentQueryDto } from './departments.types.js';
 import { DatabaseError } from '../../utils/errors.js';
 
 export class DepartmentsRepository {
-  async findAll(query: DepartmentQueryDto): Promise<{ data: Department[]; total: number }> {
-    let queryBuilder = supabaseAdminClient
+  async findAll(
+    query: DepartmentQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<{ data: Department[]; total: number }> {
+    let queryBuilder = client
       .from('departments')
       .select(`
         *,
@@ -41,8 +45,8 @@ export class DepartmentsRepository {
     };
   }
 
-  async findById(id: string): Promise<Department | null> {
-    const { data, error } = await supabaseAdminClient
+  async findById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<Department | null> {
+    const { data, error } = await client
       .from('departments')
       .select(`
         *,
@@ -63,8 +67,8 @@ export class DepartmentsRepository {
     return data as Department | null;
   }
 
-  async create(dto: CreateDepartmentDto): Promise<Department> {
-    const { data, error } = await supabaseAdminClient
+  async create(dto: CreateDepartmentDto, client: SupabaseClient = supabaseAdminClient): Promise<Department> {
+    const { data, error } = await client
       .from('departments')
       .insert(dto)
       .select()
@@ -77,8 +81,8 @@ export class DepartmentsRepository {
     return data as Department;
   }
 
-  async update(id: string, dto: UpdateDepartmentDto): Promise<Department | null> {
-    const { data, error } = await supabaseAdminClient
+  async update(id: string, dto: UpdateDepartmentDto, client: SupabaseClient = supabaseAdminClient): Promise<Department | null> {
+    const { data, error } = await client
       .from('departments')
       .update(dto)
       .eq('id', id)
@@ -92,8 +96,8 @@ export class DepartmentsRepository {
     return data as Department | null;
   }
 
-  async delete(id: string): Promise<boolean> {
-    const { error } = await supabaseAdminClient
+  async delete(id: string, client: SupabaseClient = supabaseAdminClient): Promise<boolean> {
+    const { error } = await client
       .from('departments')
       .delete()
       .eq('id', id);

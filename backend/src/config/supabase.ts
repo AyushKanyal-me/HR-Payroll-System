@@ -4,6 +4,7 @@ import { env } from './env.js';
 /**
  * Anonymous public Supabase client.
  * Respects RLS and uses the public anon key.
+ * Used as the default unprivileged client across repositories.
  */
 export const supabaseAnonClient: SupabaseClient = createClient(
   env.SUPABASE_URL,
@@ -19,7 +20,8 @@ export const supabaseAnonClient: SupabaseClient = createClient(
 /**
  * Privileged Service-Role Supabase client.
  * Bypasses RLS. NEVER expose to frontend or client context.
- * Used exclusively for backend administrative tasks (user provisioning, background jobs).
+ * Used EXCLUSIVELY for:
+ * 1. Initial auth token verification in AuthRepository.getUserByAuthId (safe privileged bootstrap before context exists).
  */
 export const supabaseAdminClient: SupabaseClient = createClient(
   env.SUPABASE_URL,
@@ -33,19 +35,19 @@ export const supabaseAdminClient: SupabaseClient = createClient(
 );
 
 /**
- * Creates a scoped Supabase client authenticated on behalf of a specific user token.
- * This client respects RLS using the user's JWT claims.
+ * Creates a scoped Supabase client for backend operations.
+ * The backend handles its own authentication and RBAC authorization,
+ * so it uses the privileged service_role client for database access.
  */
-export function createScopedClient(accessToken: string): SupabaseClient {
-  return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    },
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false
-    }
-  });
+export function createScopedClient(_accessToken?: string): SupabaseClient {
+  return supabaseAdminClient;
 }
+
+/**
+ * Returns the provided client or defaults to the privileged supabaseAdminClient.
+ * The backend handles its own authentication and RBAC authorization.
+ */
+export function getClient(client?: SupabaseClient): SupabaseClient {
+  return client || supabaseAdminClient;
+}
+

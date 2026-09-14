@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createDepartmentSchema = z.object({
-  company_id: z.string().uuid('Invalid company ID'),
+  company_id: z.string().uuid('Invalid company ID').optional(),
   name: z.string().min(1, 'Department name is required'),
   code: z.string().min(1, 'Department code is required'),
   parent_department_id: z.string().uuid().nullable().optional(),

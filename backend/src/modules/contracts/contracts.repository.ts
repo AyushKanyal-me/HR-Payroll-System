@@ -1,14 +1,18 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import { Contract, CreateContractDto, UpdateContractDto, ContractQueryDto } from './contracts.types.js';
 import { DatabaseError, ConflictError } from '../../utils/errors.js';
 
 export class ContractsRepository {
-  async findAll(query: ContractQueryDto): Promise<{ data: Contract[]; total: number }> {
-    let queryBuilder = supabaseAdminClient
+  async findAll(
+    query: ContractQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<{ data: Contract[]; total: number }> {
+    let queryBuilder = client
       .from('contracts')
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         department:departments (id, name),
         job_position:job_positions (id, title),
         schedule:working_schedules (id, name, hours_per_week),
@@ -44,12 +48,12 @@ export class ContractsRepository {
     };
   }
 
-  async findById(id: string): Promise<Contract | null> {
-    const { data, error } = await supabaseAdminClient
+  async findById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<Contract | null> {
+    const { data, error } = await client
       .from('contracts')
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         department:departments (id, name),
         job_position:job_positions (id, title),
         schedule:working_schedules (id, name, hours_per_week),
@@ -65,13 +69,13 @@ export class ContractsRepository {
     return data as Contract | null;
   }
 
-  async create(dto: CreateContractDto): Promise<Contract> {
-    const { data, error } = await supabaseAdminClient
+  async create(dto: CreateContractDto, client: SupabaseClient = supabaseAdminClient): Promise<Contract> {
+    const { data, error } = await client
       .from('contracts')
       .insert(dto)
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         department:departments (id, name),
         job_position:job_positions (id, title),
         schedule:working_schedules (id, name, hours_per_week),
@@ -89,14 +93,14 @@ export class ContractsRepository {
     return data as Contract;
   }
 
-  async update(id: string, dto: UpdateContractDto): Promise<Contract | null> {
-    const { data, error } = await supabaseAdminClient
+  async update(id: string, dto: UpdateContractDto, client: SupabaseClient = supabaseAdminClient): Promise<Contract | null> {
+    const { data, error } = await client
       .from('contracts')
       .update(dto)
       .eq('id', id)
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         department:departments (id, name),
         job_position:job_positions (id, title),
         schedule:working_schedules (id, name, hours_per_week),
@@ -114,8 +118,8 @@ export class ContractsRepository {
     return data as Contract | null;
   }
 
-  async close(id: string, closeDate: string): Promise<Contract | null> {
-    const { data, error } = await supabaseAdminClient
+  async close(id: string, closeDate: string, client: SupabaseClient = supabaseAdminClient): Promise<Contract | null> {
+    const { data, error } = await client
       .from('contracts')
       .update({
         status: 'EXPIRED',
@@ -124,7 +128,7 @@ export class ContractsRepository {
       .eq('id', id)
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email)
+        employee:employees (id, first_name, last_name, work_email, company_id)
       `)
       .maybeSingle();
 

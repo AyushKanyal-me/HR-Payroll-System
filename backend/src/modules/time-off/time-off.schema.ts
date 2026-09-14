@@ -6,7 +6,7 @@ export const timeOffRequestStatusEnum = z.enum(['PENDING', 'APPROVED', 'REFUSED'
 
 // Leave Types
 export const createTimeOffTypeSchema = z.object({
-  company_id: z.string().uuid('Invalid company ID'),
+  company_id: z.string().uuid('Invalid company ID').optional(),
   name: z.string().min(1, 'Type name is required'),
   code: z.string().min(1, 'Type code is required'),
   unit: timeOffUnitEnum.default('DAYS'),

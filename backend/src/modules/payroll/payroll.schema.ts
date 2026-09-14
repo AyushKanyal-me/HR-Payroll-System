@@ -9,7 +9,7 @@ export const payrunStatusEnum = z.enum([
 ]);
 
 export const createPayrunSchema = z.object({
-  company_id: z.string().uuid('Invalid company ID'),
+  company_id: z.string().uuid('Invalid company ID').optional(),
   salary_structure_id: z.string().uuid('Invalid salary structure ID'),
   name: z.string().min(1, 'Payrun batch name is required'),
   period_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'period_start must be YYYY-MM-DD'),
@@ -37,4 +37,9 @@ export const eligibleEmployeesQuerySchema = z.object({
   salary_structure_id: z.string().uuid('Invalid salary structure ID'),
   period_start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   period_end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+});
+
+export const payrunEmployeeParamsSchema = z.object({
+  id: z.string().uuid('Invalid payrun ID format'),
+  employeeId: z.string().uuid('Invalid employee ID format')
 });

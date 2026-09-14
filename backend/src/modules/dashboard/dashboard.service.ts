@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { DashboardRepository, dashboardRepository } from './dashboard.repository.js';
 import { DashboardFilterDto, AttendanceOverviewFilterDto } from './dashboard.schema.js';
 import {
@@ -11,12 +12,12 @@ import {
 export class DashboardService {
   constructor(private readonly repo: DashboardRepository = dashboardRepository) {}
 
-  async getKpis(companyId: string, filters?: DashboardFilterDto): Promise<DashboardKpis> {
+  async getKpis(companyId: string, filters?: DashboardFilterDto, client?: SupabaseClient): Promise<DashboardKpis> {
     const [employees, payruns, payslips, timeOff] = await Promise.all([
-      this.repo.getEmployeesForCompany(companyId, filters),
-      this.repo.getPayrunsForCompany(companyId, filters),
-      this.repo.getPayslipsForCompany(companyId, filters),
-      this.repo.getTimeOffMetricsForCompany(companyId)
+      this.repo.getEmployeesForCompany(companyId, filters, client),
+      this.repo.getPayrunsForCompany(companyId, filters, client),
+      this.repo.getPayslipsForCompany(companyId, filters, client),
+      this.repo.getTimeOffMetricsForCompany(companyId, client)
     ]);
 
     // Headcount calculations
@@ -40,9 +41,11 @@ export class DashboardService {
     let totalDeductions = 0;
     let paidPayslipsCount = 0;
 
+    const validStatuses = ['PAID', 'VALIDATED', 'CONFIRMED', 'COMPUTED'];
+
     for (const ps of payslips) {
       const payrun = (ps as any).payruns;
-      if (payrun?.status === 'PAID') {
+      if (validStatuses.includes(payrun?.status || '')) {
         totalNetSalaryPaid += Number(ps.net_salary || 0);
         totalGrossSalaryPaid += Number(ps.gross_salary || 0);
         totalDeductions += Number(ps.total_deductions || 0);
@@ -78,13 +81,15 @@ export class DashboardService {
     };
   }
 
-  async getSalaryByDepartment(companyId: string, filters?: DashboardFilterDto): Promise<DepartmentSalaryItem[]> {
+  async getSalaryByDepartment(companyId: string, filters?: DashboardFilterDto, client?: SupabaseClient): Promise<DepartmentSalaryItem[]> {
     const [departments, employees, contracts, payslips] = await Promise.all([
-      this.repo.getDepartmentsForCompany(companyId),
-      this.repo.getEmployeesForCompany(companyId, filters),
-      this.repo.getActiveContractsForCompany(companyId),
-      this.repo.getPayslipsForCompany(companyId, filters)
+      this.repo.getDepartmentsForCompany(companyId, client),
+      this.repo.getEmployeesForCompany(companyId, filters, client),
+      this.repo.getActiveContractsForCompany(companyId, client),
+      this.repo.getPayslipsForCompany(companyId, filters, client)
     ]);
+
+    const validStatuses = ['PAID', 'VALIDATED', 'CONFIRMED', 'COMPUTED'];
 
     // Map departments
     return departments.map((dept: any) => {
@@ -92,17 +97,17 @@ export class DashboardService {
       const deptEmployees = employees.filter((e: any) => e.department_id === dept.id && e.status === 'ACTIVE');
       const headcount = deptEmployees.length;
 
-      // 2. Contracts in department
-      const deptContracts = contracts.filter((c: any) => c.department_id === dept.id);
+      // 2. Contracts in department (check contract direct department or employee's assigned department)
+      const deptContracts = contracts.filter((c: any) => (c.department_id === dept.id) || (!c.department_id && c.employees?.department_id === dept.id));
       const activeContractCount = deptContracts.length;
       const totalWage = deptContracts.reduce((sum: number, c: any) => sum + Number(c.wage || 0), 0);
       const averageWage = activeContractCount > 0 ? Math.round((totalWage / activeContractCount) * 100) / 100 : 0;
 
-      // 3. Paid payslips in department
+      // 3. Paid/Validated payslips in department
       const deptPayslips = payslips.filter((ps: any) => {
         const emp = ps.employees;
         const payrun = ps.payruns;
-        return emp?.department_id === dept.id && payrun?.status === 'PAID';
+        return (emp?.department_id === dept.id) && validStatuses.includes(payrun?.status || '');
       });
 
       const totalPaidNet = deptPayslips.reduce((sum: number, ps: any) => sum + Number(ps.net_salary || 0), 0);
@@ -122,8 +127,8 @@ export class DashboardService {
     });
   }
 
-  async getSalaryTrends(companyId: string, filters?: DashboardFilterDto): Promise<SalaryTrendItem[]> {
-    const payruns = await this.repo.getPayrunsForCompany(companyId, filters);
+  async getSalaryTrends(companyId: string, filters?: DashboardFilterDto, client?: SupabaseClient): Promise<SalaryTrendItem[]> {
+    const payruns = await this.repo.getPayrunsForCompany(companyId, filters, client);
 
     // Group payruns by period month (YYYY-MM)
     const monthlyGroups = new Map<string, {
@@ -178,7 +183,7 @@ export class DashboardService {
     return result.sort((a, b) => a.period.localeCompare(b.period));
   }
 
-  async getAttendanceOverview(companyId: string, filters?: AttendanceOverviewFilterDto): Promise<AttendanceOverview> {
+  async getAttendanceOverview(companyId: string, filters?: AttendanceOverviewFilterDto, client?: SupabaseClient): Promise<AttendanceOverview> {
     const now = new Date();
     const defaultStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0] ?? '2026-01-01';
     const defaultEnd = now.toISOString().split('T')[0] ?? '2026-01-31';
@@ -196,7 +201,7 @@ export class DashboardService {
       ...filters,
       startDate: computedStartDate,
       endDate: computedEndDate
-    });
+    }, client);
 
     const breakdown = {
       present: 0,
@@ -239,12 +244,12 @@ export class DashboardService {
     };
   }
 
-  async getOperationalAlerts(companyId: string): Promise<OperationalAlerts> {
+  async getOperationalAlerts(companyId: string, client?: SupabaseClient): Promise<OperationalAlerts> {
     const [employees, expiringContractsRaw, pendingRequestsRaw, warningsRaw] = await Promise.all([
-      this.repo.getEmployeesForCompany(companyId),
-      this.repo.getExpiringContracts(companyId, 30),
-      this.repo.getPendingTimeOffRequests(companyId),
-      this.repo.getUnresolvedPayrollWarnings(companyId)
+      this.repo.getEmployeesForCompany(companyId, undefined, client),
+      this.repo.getExpiringContracts(companyId, 30, client),
+      this.repo.getPendingTimeOffRequests(companyId, client),
+      this.repo.getUnresolvedPayrollWarnings(companyId, client)
     ]);
 
     // 1. Missing bank details for active employees

@@ -1,5 +1,15 @@
 import { EvaluatedRuleResult } from './SalaryRuleEvaluator.js';
 
+export interface BuiltPayslipItem {
+  salary_rule_id: string | null;
+  name: string;
+  code: string;
+  category: string;
+  sequence: number;
+  amount: number;
+  calculation_snapshot: Record<string, unknown>;
+}
+
 export interface BuiltPayslip {
   payrunId: string;
   employeeId: string;
@@ -13,15 +23,7 @@ export interface BuiltPayslip {
   totalDeductions: number;
   netSalary: number;
   status: 'GENERATED';
-  items: {
-    salary_rule_id: string;
-    name: string;
-    code: string;
-    category: string;
-    sequence: number;
-    amount: number;
-    calculation_snapshot: Record<string, unknown>;
-  }[];
+  items: BuiltPayslipItem[];
 }
 
 export class PayslipBuilder {
@@ -53,7 +55,7 @@ export class PayslipBuilder {
       netSalary: net,
       status: 'GENERATED',
       items: evaluatedRules.map((er) => ({
-        salary_rule_id: er.rule.id,
+        salary_rule_id: er.rule.id ? er.rule.id : null,
         name: er.rule.name,
         code: er.rule.code,
         category: er.rule.category,
@@ -64,3 +66,4 @@ export class PayslipBuilder {
     };
   }
 }
+

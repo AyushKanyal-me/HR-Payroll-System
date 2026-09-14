@@ -166,7 +166,8 @@ describe('Phase 9 — Audit Logs Test Suite', () => {
           endDate: '2026-09-30',
           page: 1,
           limit: 10
-        })
+        }),
+        expect.anything()
       );
     });
 

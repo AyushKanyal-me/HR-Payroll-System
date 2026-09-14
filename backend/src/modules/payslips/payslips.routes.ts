@@ -33,7 +33,7 @@ payslipsRouter.get(
 
 payslipsRouter.post(
   '/:id/send-email',
-  requireAnyRole('ADMIN', 'HR_PAYROLL_MANAGER'),
+  requireAnyRole('ADMIN', 'HR_MANAGER', 'HR_PAYROLL_MANAGER'),
   validateRequest({ params: payslipIdParamSchema }),
   payslipsController.sendEmail
 );
@@ -44,7 +44,7 @@ payslipDeliveriesRouter.use(requireAuth());
 
 payslipDeliveriesRouter.get(
   '/',
-  requireAnyRole('ADMIN', 'HR_PAYROLL_MANAGER', 'HR_PAYROLL_USER'),
+  requireAnyRole('ADMIN', 'HR_MANAGER', 'HR_PAYROLL_MANAGER', 'HR_PAYROLL_USER'),
   validateRequest({ query: deliveryQuerySchema }),
   payslipsController.getDeliveries
 );

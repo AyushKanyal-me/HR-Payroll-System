@@ -1,10 +1,11 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import { Company, UpdateCompanyDto } from './companies.types.js';
 import { DatabaseError } from '../../utils/errors.js';
 
 export class CompaniesRepository {
-  async findAll(): Promise<Company[]> {
-    const { data, error } = await supabaseAdminClient
+  async findAll(client: SupabaseClient = supabaseAdminClient): Promise<Company[]> {
+    const { data, error } = await client
       .from('companies')
       .select('*')
       .order('created_at', { ascending: true });
@@ -16,8 +17,8 @@ export class CompaniesRepository {
     return (data || []) as Company[];
   }
 
-  async findById(id: string): Promise<Company | null> {
-    const { data, error } = await supabaseAdminClient
+  async findById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<Company | null> {
+    const { data, error } = await client
       .from('companies')
       .select('*')
       .eq('id', id)
@@ -30,8 +31,8 @@ export class CompaniesRepository {
     return data as Company | null;
   }
 
-  async update(id: string, dto: UpdateCompanyDto): Promise<Company | null> {
-    const { data, error } = await supabaseAdminClient
+  async update(id: string, dto: UpdateCompanyDto, client: SupabaseClient = supabaseAdminClient): Promise<Company | null> {
+    const { data, error } = await client
       .from('companies')
       .update(dto)
       .eq('id', id)

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { salaryController } from './salary.controller.js';
 import { requireAuth } from '../../middleware/auth.js';
-import { requireAnyRole } from '../../middleware/rbac.js';
+import { requireAnyRole, requireRole } from '../../middleware/rbac.js';
 import { validateRequest } from '../../middleware/validate.js';
 import {
   createSalaryStructureSchema,
@@ -32,14 +32,14 @@ salaryStructuresRouter.get(
 
 salaryStructuresRouter.post(
   '/',
-  requireAnyRole('ADMIN', 'HR_PAYROLL_MANAGER'),
+  requireRole('ADMIN'),
   validateRequest({ body: createSalaryStructureSchema }),
   salaryController.createStructure
 );
 
 salaryStructuresRouter.patch(
   '/:id',
-  requireAnyRole('ADMIN', 'HR_PAYROLL_MANAGER'),
+  requireRole('ADMIN'),
   validateRequest({ params: structureIdParamSchema, body: updateSalaryStructureSchema }),
   salaryController.updateStructure
 );

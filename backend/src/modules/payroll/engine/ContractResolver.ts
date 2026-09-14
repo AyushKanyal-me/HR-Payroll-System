@@ -1,25 +1,21 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../../config/supabase.js';
 import { Contract } from '../../contracts/contracts.types.js';
 
 export class ContractResolver {
   /**
-   * Resolves the active contract for an employee valid for the payroll period.
-   * Uses DB function get_applicable_contract or direct fallback query.
+   * Resolves the active contract for an employee overlapping the payroll period.
+   * A contract is valid if:
+   *   contract.start_date <= periodEnd
+   *   AND (contract.end_date IS NULL OR contract.end_date >= periodStart)
    */
-  async resolve(employeeId: string, periodStart: string, periodEnd: string): Promise<Contract | null> {
-    // Try calling DB function get_applicable_contract for period end
-    const { data: rpcData, error: rpcError } = await supabaseAdminClient
-      .rpc('get_applicable_contract', {
-        p_employee_id: employeeId,
-        p_payroll_date: periodEnd
-      });
-
-    if (!rpcError && rpcData && rpcData.length > 0) {
-      return rpcData[0] as Contract;
-    }
-
-    // Direct fallback query
-    const { data, error } = await supabaseAdminClient
+  async resolve(
+    employeeId: string,
+    periodStart: string,
+    periodEnd: string,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<Contract | null> {
+    const { data, error } = await client
       .from('contracts')
       .select(`
         *,
@@ -43,3 +39,4 @@ export class ContractResolver {
     return data as Contract;
   }
 }
+

@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import {
   WorkingSchedule,
@@ -9,8 +10,11 @@ import {
 import { DatabaseError } from '../../utils/errors.js';
 
 export class SchedulesRepository {
-  async findAll(query: ScheduleQueryDto): Promise<WorkingSchedule[]> {
-    let queryBuilder = supabaseAdminClient
+  async findAll(
+    query: ScheduleQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<WorkingSchedule[]> {
+    let queryBuilder = client
       .from('working_schedules')
       .select(`
         *,
@@ -44,8 +48,8 @@ export class SchedulesRepository {
     return (data || []) as WorkingSchedule[];
   }
 
-  async findById(id: string): Promise<WorkingSchedule | null> {
-    const { data, error } = await supabaseAdminClient
+  async findById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<WorkingSchedule | null> {
+    const { data, error } = await client
       .from('working_schedules')
       .select(`
         *,
@@ -70,10 +74,10 @@ export class SchedulesRepository {
     return data as WorkingSchedule | null;
   }
 
-  async create(dto: CreateScheduleDto): Promise<WorkingSchedule> {
+  async create(dto: CreateScheduleDto, client: SupabaseClient = supabaseAdminClient): Promise<WorkingSchedule> {
     const { days, ...scheduleData } = dto;
 
-    const { data: schedule, error: schedError } = await supabaseAdminClient
+    const { data: schedule, error: schedError } = await client
       .from('working_schedules')
       .insert(scheduleData)
       .select()
@@ -90,7 +94,7 @@ export class SchedulesRepository {
         schedule_id: schedule.id
       }));
 
-      const { data: daysData, error: daysError } = await supabaseAdminClient
+      const { data: daysData, error: daysError } = await client
         .from('schedule_days')
         .insert(daysToInsert)
         .select();
@@ -107,11 +111,11 @@ export class SchedulesRepository {
     };
   }
 
-  async update(id: string, dto: UpdateScheduleDto): Promise<WorkingSchedule | null> {
+  async update(id: string, dto: UpdateScheduleDto, client: SupabaseClient = supabaseAdminClient): Promise<WorkingSchedule | null> {
     const { days, ...scheduleData } = dto;
 
     if (Object.keys(scheduleData).length > 0) {
-      const { error: updateError } = await supabaseAdminClient
+      const { error: updateError } = await client
         .from('working_schedules')
         .update(scheduleData)
         .eq('id', id);
@@ -123,14 +127,14 @@ export class SchedulesRepository {
 
     if (days) {
       // Replace schedule days
-      await supabaseAdminClient.from('schedule_days').delete().eq('schedule_id', id);
+      await client.from('schedule_days').delete().eq('schedule_id', id);
 
       if (days.length > 0) {
         const daysToInsert = days.map((d) => ({
           ...d,
           schedule_id: id
         }));
-        const { error: daysError } = await supabaseAdminClient
+        const { error: daysError } = await client
           .from('schedule_days')
           .insert(daysToInsert);
 
@@ -140,11 +144,11 @@ export class SchedulesRepository {
       }
     }
 
-    return this.findById(id);
+    return this.findById(id, client);
   }
 
-  async delete(id: string): Promise<boolean> {
-    const { error } = await supabaseAdminClient
+  async delete(id: string, client: SupabaseClient = supabaseAdminClient): Promise<boolean> {
+    const { error } = await client
       .from('working_schedules')
       .delete()
       .eq('id', id);

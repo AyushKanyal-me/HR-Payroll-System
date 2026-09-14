@@ -18,7 +18,8 @@ export interface Employee {
   personal_email: string | null;
   phone: string | null;
   hire_date: string;
-  employment_type: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN';
+  employee_type?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN';
+  employment_type?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERN';
   status: 'ACTIVE' | 'INACTIVE' | 'TERMINATED';
   bank_account_number: string | null;
   bank_name: string | null;

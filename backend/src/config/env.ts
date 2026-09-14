@@ -9,6 +9,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PREFIX: z.string().default('/api/v1'),
   CORS_ORIGIN: z.string().default('*'),
+  FRONTEND_URL: z.string().default('http://localhost:5173'),
   SUPABASE_URL: z.string().url('SUPABASE_URL must be a valid URL'),
   SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY is required'),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'SUPABASE_SERVICE_ROLE_KEY is required'),
@@ -17,7 +18,7 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number().optional(),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
-  SMTP_FROM: z.string().default('PeoplePay360 HR <noreply@peoplepay360.com>')
+  SMTP_FROM: z.string().default('HR Pay 360 <noreply@hrpay360.com>')
 });
 
 const parsed = envSchema.safeParse(process.env);

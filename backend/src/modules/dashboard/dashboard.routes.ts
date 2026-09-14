@@ -21,10 +21,10 @@ router.get(
 );
 
 /**
- * GET /api/v1/dashboard/salary-by-dept
+ * GET /api/v1/dashboard/salary-by-dept & /api/v1/dashboard/salary-by-department
  */
 router.get(
-  '/salary-by-dept',
+  ['/salary-by-dept', '/salary-by-department'],
   validateRequest({ query: dashboardFilterSchema }),
   dashboardController.getSalaryByDept
 );
@@ -48,10 +48,10 @@ router.get(
 );
 
 /**
- * GET /api/v1/dashboard/operational-alerts
+ * GET /api/v1/dashboard/operational-alerts & /api/v1/dashboard/alerts
  */
 router.get(
-  '/operational-alerts',
+  ['/operational-alerts', '/alerts'],
   dashboardController.getOperationalAlerts
 );
 

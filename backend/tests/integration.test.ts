@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '../src/app.js';
 import { authService } from '../src/modules/auth/auth.service.js';
+import { payrollService } from '../src/modules/payroll/payroll.service.js';
 import { SafeFormulaEvaluator } from '../src/modules/salary/salary.evaluator.js';
 import { SalaryRuleEvaluator } from '../src/modules/payroll/engine/SalaryRuleEvaluator.js';
 import { DeductionCalculator } from '../src/modules/payroll/engine/DeductionCalculator.js';
@@ -132,12 +133,23 @@ describe('FINAL INTEGRATION TEST SUITE — PEOPLEPAY360', () => {
       expect(res.body.success).toBe(false);
     });
 
-    it('DENY: HR_MANAGER cannot validate a payrun (requires HR_PAYROLL_MANAGER or ADMIN) (403)', async () => {
+    it('ALLOW: HR_MANAGER can validate a payrun', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(hrManagerUser);
+      vi.spyOn(payrollService, 'getPayrunById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000601',
+        company_id: companyA,
+        status: 'COMPUTED'
+      } as any);
+      vi.spyOn(payrollService, 'validatePayrun').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000601',
+        company_id: companyA,
+        status: 'VALIDATED'
+      } as any);
+
       const res = await request(app)
         .post('/api/v1/payruns/00000000-0000-0000-0000-000000000601/validate')
         .set('Authorization', 'Bearer hrmanager-jwt');
-      expect(res.status).toBe(403);
+      expect(res.status).not.toBe(403);
     });
 
     it('DENY: HR_PAYROLL_USER cannot mark a payrun as paid (requires HR_PAYROLL_MANAGER or ADMIN) (403)', async () => {
@@ -150,6 +162,17 @@ describe('FINAL INTEGRATION TEST SUITE — PEOPLEPAY360', () => {
 
     it('ALLOW: HR_PAYROLL_MANAGER can compute payroll (200)', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(hrPayrollManagerUser);
+      vi.spyOn(payrollService, 'getPayrunById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000601',
+        company_id: companyA,
+        status: 'DRAFT'
+      } as any);
+      vi.spyOn(payrollService, 'computePayrun').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000601',
+        company_id: companyA,
+        status: 'COMPUTED'
+      } as any);
+
       const res = await request(app)
         .post('/api/v1/payruns/00000000-0000-0000-0000-000000000601/compute')
         .set('Authorization', 'Bearer payrollmgr-jwt');

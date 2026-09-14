@@ -13,6 +13,7 @@ export interface JobPosition {
     id: string;
     name: string;
     code: string;
+    company_id?: string;
   } | null;
 }
 

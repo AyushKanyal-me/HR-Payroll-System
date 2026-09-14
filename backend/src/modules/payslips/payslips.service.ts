@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { payslipsRepository, PayslipsRepository } from './payslips.repository.js';
 import { generatePayslipPdfBuffer } from '../../utils/pdf.js';
 import { EmailService } from '../../utils/email.js';
@@ -5,14 +6,14 @@ import { PayslipDetailed, PayslipQueryDto, DeliveryQueryDto } from './payslips.t
 import { NotFoundError, ForbiddenError, BadRequestError } from '../../utils/errors.js';
 
 export class PayslipsService {
-  constructor(private readonly repo: PayslipsRepository = payslipsRepository) { }
+  constructor(private readonly repo: PayslipsRepository = payslipsRepository) {}
 
-  async getPayslips(query: PayslipQueryDto) {
-    return this.repo.findAll(query);
+  async getPayslips(query: PayslipQueryDto, client?: SupabaseClient) {
+    return this.repo.findAll(query, client);
   }
 
-  async getPayslipById(id: string, userEmployeeId?: string | null, isPrivileged = false): Promise<PayslipDetailed> {
-    const payslip = await this.repo.findById(id);
+  async getPayslipById(id: string, userEmployeeId?: string | null, isPrivileged = false, client?: SupabaseClient): Promise<PayslipDetailed> {
+    const payslip = await this.repo.findById(id, client);
     if (!payslip) {
       throw new NotFoundError(`Payslip with ID '${id}' not found`);
     }
@@ -24,12 +25,12 @@ export class PayslipsService {
     return payslip;
   }
 
-  async generatePdf(payslipId: string, userEmployeeId?: string | null, isPrivileged = false): Promise<Buffer> {
-    const payslip = await this.getPayslipById(payslipId, userEmployeeId, isPrivileged);
+  async generatePdf(payslipId: string, userEmployeeId?: string | null, isPrivileged = false, client?: SupabaseClient): Promise<Buffer> {
+    const payslip = await this.getPayslipById(payslipId, userEmployeeId, isPrivileged, client);
 
     const pdfData = {
       company: {
-        name: payslip.payrun?.company?.name || 'PeoplePay360',
+        name: payslip.payrun?.company?.name || 'HR Pay 360',
         currency: payslip.payrun?.company?.currency || 'INR',
         tax_id: payslip.payrun?.company?.tax_id
       },
@@ -64,8 +65,8 @@ export class PayslipsService {
     return generatePayslipPdfBuffer(pdfData);
   }
 
-  async sendPayslipEmail(payslipId: string): Promise<{ success: boolean; deliveryId: string }> {
-    const payslip = await this.repo.findById(payslipId);
+  async sendPayslipEmail(payslipId: string, client?: SupabaseClient): Promise<{ success: boolean; deliveryId: string }> {
+    const payslip = await this.repo.findById(payslipId, client);
     if (!payslip) {
       throw new NotFoundError(`Payslip with ID '${payslipId}' not found`);
     }
@@ -76,8 +77,8 @@ export class PayslipsService {
     }
 
     try {
-      const pdfBuffer = await this.generatePdf(payslipId, null, true);
-      const companyName = payslip.payrun?.company?.name || 'PeoplePay360';
+      const pdfBuffer = await this.generatePdf(payslipId, null, true, client);
+      const companyName = payslip.payrun?.company?.name || 'HR Pay 360';
 
       await EmailService.sendEmail({
         to: email,
@@ -99,16 +100,16 @@ export class PayslipsService {
         ]
       });
 
-      const delivery = await this.repo.recordDelivery(payslipId, email, 'SENT');
+      const delivery = await this.repo.recordDelivery(payslipId, email, 'SENT', undefined, client);
       return { success: true, deliveryId: delivery.id };
     } catch (err: any) {
-      await this.repo.recordDelivery(payslipId, email, 'FAILED', err.message);
+      await this.repo.recordDelivery(payslipId, email, 'FAILED', err.message, client);
       throw new BadRequestError(`Email delivery failed: ${err.message}`);
     }
   }
 
-  async sendBulkPayrunPayslips(payrunId: string): Promise<{ total: number; sent: number; failed: number }> {
-    const payslips = await this.repo.findPayslipsByPayrunId(payrunId);
+  async sendBulkPayrunPayslips(payrunId: string, client?: SupabaseClient): Promise<{ total: number; sent: number; failed: number }> {
+    const payslips = await this.repo.findPayslipsByPayrunId(payrunId, client);
     if (payslips.length === 0) {
       throw new BadRequestError(`No generated payslips found for payrun ID '${payrunId}'`);
     }
@@ -118,7 +119,7 @@ export class PayslipsService {
 
     for (const ps of payslips) {
       try {
-        await this.sendPayslipEmail(ps.id);
+        await this.sendPayslipEmail(ps.id, client);
         sent++;
       } catch {
         failed++;
@@ -128,8 +129,8 @@ export class PayslipsService {
     return { total: payslips.length, sent, failed };
   }
 
-  async getDeliveries(query: DeliveryQueryDto) {
-    return this.repo.findAllDeliveries(query);
+  async getDeliveries(query: DeliveryQueryDto, client?: SupabaseClient) {
+    return this.repo.findAllDeliveries(query, client);
   }
 }
 

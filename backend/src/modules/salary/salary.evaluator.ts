@@ -14,6 +14,10 @@ export class SafeFormulaEvaluator {
     let i = 0;
     const clean = formula.trim();
 
+    if (!clean) {
+      throw new BadRequestError('Formula cannot be empty');
+    }
+
     while (i < clean.length) {
       const char = clean[i]!;
 
@@ -77,26 +81,125 @@ export class SafeFormulaEvaluator {
       }
 
       // Any other character is strictly forbidden
-      throw new BadRequestError(`Invalid or unauthorized character '${char}' in formula at position ${i}`);
+      throw new BadRequestError(`Invalid character '${char}' in formula at position ${i}`);
     }
 
     tokens.push({ type: 'EOF', value: '', pos: i });
     return tokens;
   }
 
-  public static validateFormulaSyntax(formula: string): boolean {
+  /**
+   * Validates syntax of an arithmetic formula using recursive descent parsing.
+   * Optionally checks that all identifiers are in the allowedIdentifiers list.
+   */
+  public static validateFormulaSyntax(formula: string, allowedIdentifiers?: string[]): boolean {
     try {
-      const tokens = this.tokenize(formula);
-      if (tokens.length <= 1) return false;
+      this.validate(formula, allowedIdentifiers);
       return true;
     } catch {
       return false;
     }
   }
 
+  /**
+   * Validates formula syntax and throws BadRequestError with details if invalid.
+   */
+  public static validate(formula: string, allowedIdentifiers?: string[]): { identifiers: string[] } {
+    const tokens = this.tokenize(formula);
+    if (tokens.length <= 1) {
+      throw new BadRequestError('Formula is empty');
+    }
+
+    let current = 0;
+    const identifiers: string[] = [];
+    const allowedSet = allowedIdentifiers
+      ? new Set(allowedIdentifiers.map((id) => id.toUpperCase()))
+      : null;
+
+    function peek(): Token {
+      return tokens[current]!;
+    }
+
+    function consume(expectedType?: TokenType): Token {
+      const tok = tokens[current]!;
+      if (expectedType && tok.type !== expectedType) {
+        throw new BadRequestError(
+          `Syntax error: Expected ${expectedType} but got ${tok.type} ('${tok.value}') at position ${tok.pos}`
+        );
+      }
+      current++;
+      return tok;
+    }
+
+    function parsePrimary() {
+      const tok = peek();
+      if (tok.type === 'NUMBER') {
+        consume('NUMBER');
+        return;
+      }
+      if (tok.type === 'IDENT') {
+        const idTok = consume('IDENT');
+        const varName = idTok.value;
+        if (allowedSet && !allowedSet.has(varName)) {
+          throw new BadRequestError(`Unknown identifier '${varName}' at position ${idTok.pos}`);
+        }
+        identifiers.push(varName);
+        return;
+      }
+      if (tok.type === 'LPAREN') {
+        consume('LPAREN');
+        parseExpr();
+        consume('RPAREN');
+        return;
+      }
+      throw new BadRequestError(`Unexpected token '${tok.value}' at position ${tok.pos}`);
+    }
+
+    function parseFactor() {
+      const tok = peek();
+      if (tok.type === 'PLUS' || tok.type === 'MINUS') {
+        consume();
+        parsePrimary();
+        return;
+      }
+      parsePrimary();
+    }
+
+    function parseTerm() {
+      parseFactor();
+      while (peek().type === 'MUL' || peek().type === 'DIV') {
+        consume();
+        parseFactor();
+      }
+    }
+
+    function parseExpr() {
+      parseTerm();
+      while (peek().type === 'PLUS' || peek().type === 'MINUS') {
+        consume();
+        parseTerm();
+      }
+    }
+
+    parseExpr();
+
+    if (peek().type !== 'EOF') {
+      const remaining = peek();
+      throw new BadRequestError(`Unexpected trailing token '${remaining.value}' at position ${remaining.pos}`);
+    }
+
+    return { identifiers };
+  }
+
   public static evaluate(formula: string, context: Record<string, number>): number {
     const tokens = this.tokenize(formula);
     let current = 0;
+
+    // Build case-insensitive context map
+    const normalizedContext: Record<string, number> = {};
+    for (const [k, v] of Object.entries(context)) {
+      normalizedContext[k.toUpperCase()] = v;
+    }
 
     function peek(): Token {
       return tokens[current]!;
@@ -123,13 +226,13 @@ export class SafeFormulaEvaluator {
 
       if (tok.type === 'IDENT') {
         consume('IDENT');
-        const varName = tok.value;
-        if (!(varName in context) || typeof context[varName] !== 'number' || isNaN(context[varName])) {
-          throw new BadRequestError(
-            `Unknown variable or unresolved dependency '${varName}' in salary rule formula at position ${tok.pos}`
-          );
+        const varName = tok.value.toUpperCase();
+        if (varName in normalizedContext && typeof normalizedContext[varName] === 'number' && !isNaN(normalizedContext[varName]!)) {
+          return normalizedContext[varName]!;
         }
-        return context[varName]!;
+        throw new BadRequestError(
+          `Unknown variable or unresolved dependency '${tok.value}' in salary rule formula at position ${tok.pos}`
+        );
       }
 
       if (tok.type === 'LPAREN') {

@@ -1,11 +1,12 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import { DashboardFilterDto, AttendanceOverviewFilterDto } from './dashboard.schema.js';
 
 export class DashboardRepository {
-  async getEmployeesForCompany(companyId: string, filters?: DashboardFilterDto) {
-    let query = supabaseAdminClient
+  async getEmployeesForCompany(companyId: string, filters?: DashboardFilterDto, client: SupabaseClient = supabaseAdminClient) {
+    let query = client
       .from('employees')
-      .select('id, employee_code, first_name, last_name, status, employee_type, department_id, bank_account_number, departments(id, name, code)')
+      .select('id, employee_code, first_name, last_name, status, employee_type, department_id, bank_account_number, departments:departments!employees_department_id_fkey(id, name, code)')
       .eq('company_id', companyId);
 
     if (filters?.departmentId) {
@@ -20,8 +21,8 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getPayrunsForCompany(companyId: string, filters?: DashboardFilterDto) {
-    let query = supabaseAdminClient
+  async getPayrunsForCompany(companyId: string, filters?: DashboardFilterDto, client: SupabaseClient = supabaseAdminClient) {
+    let query = client
       .from('payruns')
       .select('id, name, period_start, period_end, status, total_employees, total_gross, total_deductions, total_net')
       .eq('company_id', companyId)
@@ -39,8 +40,8 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getPayslipsForCompany(companyId: string, filters?: DashboardFilterDto) {
-    let query = supabaseAdminClient
+  async getPayslipsForCompany(companyId: string, filters?: DashboardFilterDto, client: SupabaseClient = supabaseAdminClient) {
+    let query = client
       .from('payslips')
       .select(`
         id,
@@ -85,9 +86,9 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getTimeOffMetricsForCompany(companyId: string) {
+  async getTimeOffMetricsForCompany(companyId: string, client: SupabaseClient = supabaseAdminClient) {
     // 1. Pending requests
-    const { data: pendingRequests, error: reqErr } = await supabaseAdminClient
+    const { data: pendingRequests, error: reqErr } = await client
       .from('time_off_requests')
       .select(`
         id,
@@ -102,7 +103,7 @@ export class DashboardRepository {
     if (reqErr) throw reqErr;
 
     // 2. Approved requests
-    const { data: approvedRequests, error: appErr } = await supabaseAdminClient
+    const { data: approvedRequests, error: appErr } = await client
       .from('time_off_requests')
       .select(`
         id,
@@ -117,7 +118,7 @@ export class DashboardRepository {
     if (appErr) throw appErr;
 
     // 3. Active allocations
-    const { data: activeAllocations, error: allocErr } = await supabaseAdminClient
+    const { data: activeAllocations, error: allocErr } = await client
       .from('time_off_allocations')
       .select(`
         id,
@@ -138,8 +139,8 @@ export class DashboardRepository {
     };
   }
 
-  async getDepartmentsForCompany(companyId: string) {
-    const { data, error } = await supabaseAdminClient
+  async getDepartmentsForCompany(companyId: string, client: SupabaseClient = supabaseAdminClient) {
+    const { data, error } = await client
       .from('departments')
       .select('id, name, code')
       .eq('company_id', companyId)
@@ -149,8 +150,8 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getActiveContractsForCompany(companyId: string) {
-    const { data, error } = await supabaseAdminClient
+  async getActiveContractsForCompany(companyId: string, client: SupabaseClient = supabaseAdminClient) {
+    const { data, error } = await client
       .from('contracts')
       .select(`
         id,
@@ -160,6 +161,7 @@ export class DashboardRepository {
         status,
         employees!inner (
           company_id,
+          department_id,
           status
         )
       `)
@@ -171,8 +173,8 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getAttendanceRecords(companyId: string, filters?: AttendanceOverviewFilterDto) {
-    let query = supabaseAdminClient
+  async getAttendanceRecords(companyId: string, filters?: AttendanceOverviewFilterDto, client: SupabaseClient = supabaseAdminClient) {
+    let query = client
       .from('attendance')
       .select(`
         id,
@@ -207,11 +209,11 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getExpiringContracts(companyId: string, daysAhead: number = 30) {
+  async getExpiringContracts(companyId: string, daysAhead: number = 30, client: SupabaseClient = supabaseAdminClient) {
     const today = new Date().toISOString().split('T')[0];
     const targetDate = new Date(Date.now() + daysAhead * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    const { data, error } = await supabaseAdminClient
+    const { data, error } = await client
       .from('contracts')
       .select(`
         id,
@@ -236,8 +238,8 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getPendingTimeOffRequests(companyId: string) {
-    const { data, error } = await supabaseAdminClient
+  async getPendingTimeOffRequests(companyId: string, client: SupabaseClient = supabaseAdminClient) {
+    const { data, error } = await client
       .from('time_off_requests')
       .select(`
         id,
@@ -264,8 +266,8 @@ export class DashboardRepository {
     return (data || []) as any[];
   }
 
-  async getUnresolvedPayrollWarnings(companyId: string) {
-    const { data, error } = await supabaseAdminClient
+  async getUnresolvedPayrollWarnings(companyId: string, client: SupabaseClient = supabaseAdminClient) {
+    const { data, error } = await client
       .from('payroll_warnings')
       .select(`
         id,

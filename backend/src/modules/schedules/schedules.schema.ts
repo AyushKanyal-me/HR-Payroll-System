@@ -21,7 +21,7 @@ export const scheduleDayInputSchema = z.object({
 });
 
 export const createScheduleSchema = z.object({
-  company_id: z.string().uuid('Invalid company ID'),
+  company_id: z.string().uuid('Invalid company ID').optional(),
   name: z.string().min(1, 'Schedule name is required'),
   schedule_type: scheduleTypeEnum.default('FIXED'),
   days_per_week: z.number().int().min(1).max(7),

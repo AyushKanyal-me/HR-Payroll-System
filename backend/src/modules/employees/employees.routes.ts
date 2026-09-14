@@ -7,7 +7,8 @@ import {
   createEmployeeSchema,
   updateEmployeeSchema,
   employeeIdParamSchema,
-  employeeQuerySchema
+  employeeQuerySchema,
+  inviteEmployeeSchema
 } from './employees.schema.js';
 
 const employeesRouter = Router();
@@ -40,6 +41,13 @@ employeesRouter.post(
   requireAnyRole('ADMIN', 'HR_MANAGER'),
   validateRequest({ body: createEmployeeSchema }),
   employeesController.create
+);
+
+employeesRouter.post(
+  '/:id/invite',
+  requireAnyRole('ADMIN', 'HR_MANAGER'),
+  validateRequest({ params: employeeIdParamSchema, body: inviteEmployeeSchema }),
+  employeesController.invite
 );
 
 employeesRouter.patch(

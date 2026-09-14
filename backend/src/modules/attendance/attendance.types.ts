@@ -5,6 +5,13 @@ import {
   attendanceQuerySchema
 } from './attendance.schema.js';
 
+export interface PunchSession {
+  check_in: string;
+  check_out: string | null;
+  duration_minutes: number;
+  duration_hours: number;
+}
+
 export interface AttendanceRecord {
   id: string;
   employee_id: string;
@@ -16,6 +23,7 @@ export interface AttendanceRecord {
   status: 'PRESENT' | 'ABSENT' | 'LATE' | 'OVERTIME' | 'MISSING_CHECKOUT';
   is_manual_edit: boolean;
   correction_note: string | null;
+  sessions?: PunchSession[];
   created_at: string;
   updated_at: string;
   employee?: {
@@ -36,6 +44,7 @@ export interface AttendanceQuickStatus {
   elapsed_minutes: number;
   worked_hours: number;
   status: string;
+  sessions?: PunchSession[];
 }
 
 export type CreateManualAttendanceDto = z.infer<typeof createManualAttendanceSchema>;

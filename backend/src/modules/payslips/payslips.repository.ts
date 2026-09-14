@@ -1,18 +1,22 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import { PayslipDetailed, PayslipDeliveryRecord, PayslipQueryDto, DeliveryQueryDto } from './payslips.types.js';
 import { DatabaseError } from '../../utils/errors.js';
 
 export class PayslipsRepository {
-  async findAll(query: PayslipQueryDto): Promise<{ data: PayslipDetailed[]; total: number }> {
-    let queryBuilder = supabaseAdminClient
+  async findAll(
+    query: PayslipQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<{ data: PayslipDetailed[]; total: number }> {
+    let queryBuilder = client
       .from('payslips')
       .select(`
         *,
         employee:employees (
-          id, first_name, last_name, work_email, department_id, job_position_id
+          id, first_name, last_name, work_email, department_id, job_position_id, company_id
         ),
         payrun:payruns (
-          id, name, status
+          id, name, status, company_id
         )
       `, { count: 'exact' });
 
@@ -46,14 +50,14 @@ export class PayslipsRepository {
     };
   }
 
-  async findById(id: string): Promise<PayslipDetailed | null> {
-    const { data, error } = await supabaseAdminClient
+  async findById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<PayslipDetailed | null> {
+    const { data, error } = await client
       .from('payslips')
       .select(`
         *,
         employee:employees (
           id, first_name, last_name, work_email, bank_account_number, company_id,
-          department:departments (id, name),
+          department:departments!employees_department_id_fkey (id, name),
           job_position:job_positions (id, title)
         ),
         payrun:payruns (
@@ -84,9 +88,10 @@ export class PayslipsRepository {
     payslipId: string,
     email: string,
     status: 'PENDING' | 'SENT' | 'FAILED',
-    errorMessage?: string
+    errorMessage?: string,
+    client: SupabaseClient = supabaseAdminClient
   ): Promise<PayslipDeliveryRecord> {
-    const { data, error } = await supabaseAdminClient
+    const { data, error } = await client
       .from('payslip_deliveries')
       .insert({
         payslip_id: payslipId,
@@ -104,7 +109,7 @@ export class PayslipsRepository {
 
     // If sent successfully, update payslip status to SENT
     if (status === 'SENT') {
-      await supabaseAdminClient
+      await client
         .from('payslips')
         .update({ status: 'SENT' })
         .eq('id', payslipId);
@@ -113,14 +118,14 @@ export class PayslipsRepository {
     return data as PayslipDeliveryRecord;
   }
 
-  async findAllDeliveries(query: DeliveryQueryDto): Promise<{ data: PayslipDeliveryRecord[]; total: number }> {
-    let queryBuilder = supabaseAdminClient
+  async findAllDeliveries(query: DeliveryQueryDto, client: SupabaseClient = supabaseAdminClient): Promise<{ data: PayslipDeliveryRecord[]; total: number }> {
+    let queryBuilder = client
       .from('payslip_deliveries')
       .select(`
         *,
         payslip:payslips (
           id, period_start, period_end, net_salary,
-          employee:employees (first_name, last_name, work_email)
+          employee:employees (first_name, last_name, work_email, company_id)
         )
       `, { count: 'exact' });
 
@@ -149,14 +154,14 @@ export class PayslipsRepository {
     };
   }
 
-  async findPayslipsByPayrunId(payrunId: string): Promise<PayslipDetailed[]> {
-    const { data, error } = await supabaseAdminClient
+  async findPayslipsByPayrunId(payrunId: string, client: SupabaseClient = supabaseAdminClient): Promise<PayslipDetailed[]> {
+    const { data, error } = await client
       .from('payslips')
       .select(`
         *,
         employee:employees (
           id, first_name, last_name, work_email, bank_account_number, company_id,
-          department:departments (id, name),
+          department:departments!employees_department_id_fkey (id, name),
           job_position:job_positions (id, title)
         ),
         payrun:payruns (

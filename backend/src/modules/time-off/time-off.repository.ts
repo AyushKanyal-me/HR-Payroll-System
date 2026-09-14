@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import {
   TimeOffType,
@@ -12,8 +13,8 @@ import { DatabaseError, ConflictError, BadRequestError } from '../../utils/error
 
 export class TimeOffRepository {
   // Types
-  async findAllTypes(): Promise<TimeOffType[]> {
-    const { data, error } = await supabaseAdminClient
+  async findAllTypes(client: SupabaseClient = supabaseAdminClient): Promise<TimeOffType[]> {
+    const { data, error } = await client
       .from('time_off_types')
       .select('*')
       .order('name', { ascending: true });
@@ -25,8 +26,8 @@ export class TimeOffRepository {
     return (data || []) as TimeOffType[];
   }
 
-  async findTypeById(id: string): Promise<TimeOffType | null> {
-    const { data, error } = await supabaseAdminClient
+  async findTypeById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffType | null> {
+    const { data, error } = await client
       .from('time_off_types')
       .select('*')
       .eq('id', id)
@@ -39,8 +40,8 @@ export class TimeOffRepository {
     return data as TimeOffType | null;
   }
 
-  async createType(dto: CreateTimeOffTypeDto): Promise<TimeOffType> {
-    const { data, error } = await supabaseAdminClient
+  async createType(dto: CreateTimeOffTypeDto, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffType> {
+    const { data, error } = await client
       .from('time_off_types')
       .insert(dto)
       .select()
@@ -54,12 +55,12 @@ export class TimeOffRepository {
   }
 
   // Allocations
-  async findAllAllocations(query: AllocationQueryDto): Promise<TimeOffAllocation[]> {
-    let queryBuilder = supabaseAdminClient
+  async findAllAllocations(query: AllocationQueryDto, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffAllocation[]> {
+    let queryBuilder = client
       .from('time_off_allocations')
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         time_off_type:time_off_types (id, name, code, unit)
       `)
       .order('year', { ascending: false });
@@ -88,9 +89,10 @@ export class TimeOffRepository {
   async findAllocationByEmployeeAndType(
     employeeId: string,
     typeId: string,
-    year: number
+    year: number,
+    client: SupabaseClient = supabaseAdminClient
   ): Promise<TimeOffAllocation | null> {
-    const { data, error } = await supabaseAdminClient
+    const { data, error } = await client
       .from('time_off_allocations')
       .select('*')
       .eq('employee_id', employeeId)
@@ -106,13 +108,13 @@ export class TimeOffRepository {
     return data as TimeOffAllocation | null;
   }
 
-  async createAllocation(dto: CreateTimeOffAllocationDto): Promise<TimeOffAllocation> {
-    const { data, error } = await supabaseAdminClient
+  async createAllocation(dto: CreateTimeOffAllocationDto, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffAllocation> {
+    const { data, error } = await client
       .from('time_off_allocations')
       .insert(dto)
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         time_off_type:time_off_types (id, name, code, unit)
       `)
       .single();
@@ -128,12 +130,15 @@ export class TimeOffRepository {
   }
 
   // Requests
-  async findAllRequests(query: TimeOffRequestQueryDto): Promise<{ data: TimeOffRequest[]; total: number }> {
-    let queryBuilder = supabaseAdminClient
+  async findAllRequests(
+    query: TimeOffRequestQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<{ data: TimeOffRequest[]; total: number }> {
+    let queryBuilder = client
       .from('time_off_requests')
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         time_off_type:time_off_types (id, name, code, unit),
         approver:users!time_off_requests_approved_by_fkey (id, first_name, last_name, email)
       `, { count: 'exact' });
@@ -167,12 +172,12 @@ export class TimeOffRepository {
     };
   }
 
-  async findRequestById(id: string): Promise<TimeOffRequest | null> {
-    const { data, error } = await supabaseAdminClient
+  async findRequestById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffRequest | null> {
+    const { data, error } = await client
       .from('time_off_requests')
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         time_off_type:time_off_types (id, name, code, unit),
         approver:users!time_off_requests_approved_by_fkey (id, first_name, last_name, email)
       `)
@@ -186,13 +191,13 @@ export class TimeOffRepository {
     return data as TimeOffRequest | null;
   }
 
-  async createRequest(dto: any): Promise<TimeOffRequest> {
-    const { data, error } = await supabaseAdminClient
+  async createRequest(dto: any, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffRequest> {
+    const { data, error } = await client
       .from('time_off_requests')
       .insert(dto)
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email),
+        employee:employees (id, first_name, last_name, work_email, company_id),
         time_off_type:time_off_types (id, name, code, unit)
       `)
       .single();
@@ -205,10 +210,25 @@ export class TimeOffRepository {
   }
 
   // Database Function Callers (Transactional)
-  async approveRequestWithDbFunction(requestId: string, approverUserId: string): Promise<TimeOffRequest> {
-    const { error } = await supabaseAdminClient.rpc('approve_time_off_request', {
+  async approveRequestWithDbFunction(requestId: string, approverUserId: string, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffRequest> {
+    let validApproverId: string | null = null;
+    if (approverUserId) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(approverUserId);
+      if (isUuid) {
+        const { data: userExists } = await supabaseAdminClient
+          .from('users')
+          .select('id')
+          .eq('id', approverUserId)
+          .maybeSingle();
+        if (userExists?.id) {
+          validApproverId = userExists.id;
+        }
+      }
+    }
+
+    const { error } = await client.rpc('approve_time_off_request', {
       p_request_id: requestId,
-      p_approver_id: approverUserId
+      p_approver_id: validApproverId
     });
 
     if (error) {
@@ -218,17 +238,32 @@ export class TimeOffRepository {
       if (error.message.includes('PENDING')) {
         throw new BadRequestError(`Cannot approve: Request is not in PENDING state.`);
       }
-      throw new DatabaseError(`Failed to approve request via database procedure: ${error.message}`, [error]);
+      throw new DatabaseError(`Failed to approve request via transactional database procedure: ${error.message}`, [error]);
     }
 
-    const updated = await this.findRequestById(requestId);
+    const updated = await this.findRequestById(requestId, client);
     return updated!;
   }
 
-  async refuseRequestWithDbFunction(requestId: string, refuserId: string, reason: string): Promise<TimeOffRequest> {
-    const { error } = await supabaseAdminClient.rpc('refuse_time_off_request', {
+  async refuseRequestWithDbFunction(requestId: string, refuserId: string, reason: string, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffRequest> {
+    let validRefuserId: string | null = null;
+    if (refuserId) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(refuserId);
+      if (isUuid) {
+        const { data: userExists } = await supabaseAdminClient
+          .from('users')
+          .select('id')
+          .eq('id', refuserId)
+          .maybeSingle();
+        if (userExists?.id) {
+          validRefuserId = userExists.id;
+        }
+      }
+    }
+
+    const { error } = await client.rpc('refuse_time_off_request', {
       p_request_id: requestId,
-      p_refuser_id: refuserId,
+      p_refuser_id: validRefuserId,
       p_rejection_reason: reason
     });
 
@@ -236,15 +271,30 @@ export class TimeOffRepository {
       if (error.message.includes('PENDING')) {
         throw new BadRequestError(`Cannot refuse: Request is not in PENDING state.`);
       }
-      throw new DatabaseError(`Failed to refuse request via database procedure: ${error.message}`, [error]);
+      if (error.message.includes('foreign key') || error.message.includes('violates')) {
+        const { error: directErr } = await supabaseAdminClient
+          .from('time_off_requests')
+          .update({
+            status: 'REFUSED',
+            rejection_reason: reason,
+            approved_by: validRefuserId,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', requestId);
+        if (directErr) {
+          throw new DatabaseError(`Failed to refuse request: ${directErr.message}`, [directErr]);
+        }
+      } else {
+        throw new DatabaseError(`Failed to refuse request via database procedure: ${error.message}`, [error]);
+      }
     }
 
-    const updated = await this.findRequestById(requestId);
+    const updated = await this.findRequestById(requestId, client);
     return updated!;
   }
 
-  async cancelRequestWithDbFunction(requestId: string, cancellerId: string): Promise<TimeOffRequest> {
-    const { error } = await supabaseAdminClient.rpc('cancel_time_off_request', {
+  async cancelRequestWithDbFunction(requestId: string, cancellerId: string, client: SupabaseClient = supabaseAdminClient): Promise<TimeOffRequest> {
+    const { error } = await client.rpc('cancel_time_off_request', {
       p_request_id: requestId,
       p_canceller_id: cancellerId
     });
@@ -253,7 +303,7 @@ export class TimeOffRepository {
       throw new DatabaseError(`Failed to cancel request via database procedure: ${error.message}`, [error]);
     }
 
-    const updated = await this.findRequestById(requestId);
+    const updated = await this.findRequestById(requestId, client);
     return updated!;
   }
 }

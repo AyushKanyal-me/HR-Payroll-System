@@ -3,6 +3,7 @@ import request from 'supertest';
 import { app } from '../src/app.js';
 import { authService } from '../src/modules/auth/auth.service.js';
 import { attendanceService } from '../src/modules/attendance/attendance.service.js';
+import { employeesRepository } from '../src/modules/employees/employees.repository.js';
 import { timeOffService } from '../src/modules/time-off/time-off.service.js';
 import { BadRequestError, ForbiddenError } from '../src/utils/errors.js';
 import { AuthenticatedUser } from '../src/types/auth.js';
@@ -130,6 +131,10 @@ describe('Phase 4 — Attendance & Time Off API Test Suite', () => {
 
     it('POST /api/v1/attendance: HR_MANAGER can create manual attendance record', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(mockHrManagerUser);
+      vi.spyOn(employeesRepository, 'findById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000102',
+        company_id: mockHrManagerUser.companyId
+      } as any);
       vi.spyOn(attendanceService, 'createManualAttendance').mockResolvedValue({
         id: '00000000-0000-0000-0000-000000000202',
         employee_id: '00000000-0000-0000-0000-000000000102',
@@ -205,6 +210,15 @@ describe('Phase 4 — Attendance & Time Off API Test Suite', () => {
 
     it('POST /api/v1/time-off/requests/:id/approve: HR_MANAGER approves request transactionally', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(mockHrManagerUser);
+      vi.spyOn(timeOffService, 'getRequestById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000301',
+        employee_id: '00000000-0000-0000-0000-000000000102',
+        status: 'PENDING',
+        employee: {
+          id: '00000000-0000-0000-0000-000000000102',
+          company_id: mockHrManagerUser.companyId
+        }
+      } as any);
       vi.spyOn(timeOffService, 'approveRequest').mockResolvedValue({
         id: '00000000-0000-0000-0000-000000000301',
         employee_id: '00000000-0000-0000-0000-000000000102',
@@ -244,6 +258,15 @@ describe('Phase 4 — Attendance & Time Off API Test Suite', () => {
 
     it('POST /api/v1/time-off/requests/:id/refuse: HR_MANAGER refuses leave with explanation', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(mockHrManagerUser);
+      vi.spyOn(timeOffService, 'getRequestById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000301',
+        employee_id: '00000000-0000-0000-0000-000000000102',
+        status: 'PENDING',
+        employee: {
+          id: '00000000-0000-0000-0000-000000000102',
+          company_id: mockHrManagerUser.companyId
+        }
+      } as any);
       vi.spyOn(timeOffService, 'refuseRequest').mockResolvedValue({
         id: '00000000-0000-0000-0000-000000000301',
         employee_id: '00000000-0000-0000-0000-000000000102',

@@ -1,8 +1,14 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../../config/supabase.js';
 
 export class AttendanceCalculator {
-  async calculate(employeeId: string, periodStart: string, periodEnd: string): Promise<{ actualWorkedDays: number; actualWorkedHours: number; missingCheckouts: number }> {
-    const { data, error } = await supabaseAdminClient
+  async calculate(
+    employeeId: string,
+    periodStart: string,
+    periodEnd: string,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<{ actualWorkedDays: number; actualWorkedHours: number; missingCheckouts: number }> {
+    const { data, error } = await client
       .from('attendance')
       .select('*')
       .eq('employee_id', employeeId)

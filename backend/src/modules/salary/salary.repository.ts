@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import {
   SalaryStructure,
@@ -13,8 +14,11 @@ import { DatabaseError, ConflictError } from '../../utils/errors.js';
 
 export class SalaryRepository {
   // Structures
-  async findAllStructures(query: SalaryStructureQueryDto): Promise<SalaryStructure[]> {
-    let queryBuilder = supabaseAdminClient
+  async findAllStructures(
+    query: SalaryStructureQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<SalaryStructure[]> {
+    let queryBuilder = client
       .from('salary_structures')
       .select(`
         *,
@@ -52,8 +56,8 @@ export class SalaryRepository {
     return structures as SalaryStructure[];
   }
 
-  async findStructureById(id: string): Promise<SalaryStructure | null> {
-    const { data, error } = await supabaseAdminClient
+  async findStructureById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<SalaryStructure | null> {
+    const { data, error } = await client
       .from('salary_structures')
       .select(`
         *,
@@ -83,10 +87,10 @@ export class SalaryRepository {
     } as SalaryStructure;
   }
 
-  async createStructure(dto: CreateSalaryStructureDto): Promise<SalaryStructure> {
+  async createStructure(dto: CreateSalaryStructureDto, client: SupabaseClient = supabaseAdminClient): Promise<SalaryStructure> {
     const { rules, ...structureData } = dto;
 
-    const { data: structure, error: structError } = await supabaseAdminClient
+    const { data: structure, error: structError } = await client
       .from('salary_structures')
       .insert(structureData)
       .select()
@@ -103,7 +107,7 @@ export class SalaryRepository {
         sequence: r.sequence
       }));
 
-      const { error: rulesError } = await supabaseAdminClient
+      const { error: rulesError } = await client
         .from('salary_structure_rules')
         .insert(junctionInserts);
 
@@ -115,14 +119,14 @@ export class SalaryRepository {
       }
     }
 
-    return (await this.findStructureById(structure.id))!;
+    return (await this.findStructureById(structure.id, client))!;
   }
 
-  async updateStructure(id: string, dto: UpdateSalaryStructureDto): Promise<SalaryStructure | null> {
+  async updateStructure(id: string, dto: UpdateSalaryStructureDto, client: SupabaseClient = supabaseAdminClient): Promise<SalaryStructure | null> {
     const { rules, ...structureData } = dto;
 
     if (Object.keys(structureData).length > 0) {
-      const { error: updateError } = await supabaseAdminClient
+      const { error: updateError } = await client
         .from('salary_structures')
         .update(structureData)
         .eq('id', id);
@@ -134,7 +138,7 @@ export class SalaryRepository {
 
     if (rules !== undefined) {
       // Re-sync rules for the structure
-      await supabaseAdminClient.from('salary_structure_rules').delete().eq('salary_structure_id', id);
+      await client.from('salary_structure_rules').delete().eq('salary_structure_id', id);
 
       if (rules.length > 0) {
         const junctionInserts = rules.map((r) => ({
@@ -143,7 +147,7 @@ export class SalaryRepository {
           sequence: r.sequence
         }));
 
-        const { error: insertError } = await supabaseAdminClient
+        const { error: insertError } = await client
           .from('salary_structure_rules')
           .insert(junctionInserts);
 
@@ -156,12 +160,12 @@ export class SalaryRepository {
       }
     }
 
-    return this.findStructureById(id);
+    return this.findStructureById(id, client);
   }
 
   // Rules
-  async findAllRules(query: SalaryRuleQueryDto): Promise<SalaryRule[]> {
-    let queryBuilder = supabaseAdminClient
+  async findAllRules(query: SalaryRuleQueryDto, client: SupabaseClient = supabaseAdminClient): Promise<SalaryRule[]> {
+    let queryBuilder = client
       .from('salary_rules')
       .select('*')
       .order('code', { ascending: true });
@@ -187,8 +191,8 @@ export class SalaryRepository {
     return (data || []) as SalaryRule[];
   }
 
-  async findRuleById(id: string): Promise<SalaryRule | null> {
-    const { data, error } = await supabaseAdminClient
+  async findRuleById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<SalaryRule | null> {
+    const { data, error } = await client
       .from('salary_rules')
       .select('*')
       .eq('id', id)
@@ -201,8 +205,8 @@ export class SalaryRepository {
     return data as SalaryRule | null;
   }
 
-  async createRule(dto: CreateSalaryRuleDto): Promise<SalaryRule> {
-    const { data, error } = await supabaseAdminClient
+  async createRule(dto: CreateSalaryRuleDto, client: SupabaseClient = supabaseAdminClient): Promise<SalaryRule> {
+    const { data, error } = await client
       .from('salary_rules')
       .insert(dto)
       .select()
@@ -215,8 +219,8 @@ export class SalaryRepository {
     return data as SalaryRule;
   }
 
-  async updateRule(id: string, dto: UpdateSalaryRuleDto): Promise<SalaryRule | null> {
-    const { data, error } = await supabaseAdminClient
+  async updateRule(id: string, dto: UpdateSalaryRuleDto, client: SupabaseClient = supabaseAdminClient): Promise<SalaryRule | null> {
+    const { data, error } = await client
       .from('salary_rules')
       .update(dto)
       .eq('id', id)

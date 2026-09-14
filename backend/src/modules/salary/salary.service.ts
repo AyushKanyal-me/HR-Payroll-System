@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { salaryRepository, SalaryRepository } from './salary.repository.js';
 import {
   SalaryStructure,
@@ -16,24 +17,24 @@ export class SalaryService {
   constructor(private readonly repo: SalaryRepository = salaryRepository) {}
 
   // Structures
-  async getStructures(query: SalaryStructureQueryDto): Promise<SalaryStructure[]> {
-    return this.repo.findAllStructures(query);
+  async getStructures(query: SalaryStructureQueryDto, client?: SupabaseClient): Promise<SalaryStructure[]> {
+    return this.repo.findAllStructures(query, client);
   }
 
-  async getStructureById(id: string): Promise<SalaryStructure> {
-    const structure = await this.repo.findStructureById(id);
+  async getStructureById(id: string, client?: SupabaseClient): Promise<SalaryStructure> {
+    const structure = await this.repo.findStructureById(id, client);
     if (!structure) {
       throw new NotFoundError(`Salary structure with ID '${id}' not found`);
     }
     return structure;
   }
 
-  async createStructure(dto: CreateSalaryStructureDto): Promise<SalaryStructure> {
-    return this.repo.createStructure(dto);
+  async createStructure(dto: CreateSalaryStructureDto, client?: SupabaseClient): Promise<SalaryStructure> {
+    return this.repo.createStructure(dto, client);
   }
 
-  async updateStructure(id: string, dto: UpdateSalaryStructureDto): Promise<SalaryStructure> {
-    const structure = await this.repo.updateStructure(id, dto);
+  async updateStructure(id: string, dto: UpdateSalaryStructureDto, client?: SupabaseClient): Promise<SalaryStructure> {
+    const structure = await this.repo.updateStructure(id, dto, client);
     if (!structure) {
       throw new NotFoundError(`Salary structure with ID '${id}' not found to update`);
     }
@@ -41,30 +42,30 @@ export class SalaryService {
   }
 
   // Rules
-  async getRules(query: SalaryRuleQueryDto): Promise<SalaryRule[]> {
-    return this.repo.findAllRules(query);
+  async getRules(query: SalaryRuleQueryDto, client?: SupabaseClient): Promise<SalaryRule[]> {
+    return this.repo.findAllRules(query, client);
   }
 
-  async getRuleById(id: string): Promise<SalaryRule> {
-    const rule = await this.repo.findRuleById(id);
+  async getRuleById(id: string, client?: SupabaseClient): Promise<SalaryRule> {
+    const rule = await this.repo.findRuleById(id, client);
     if (!rule) {
       throw new NotFoundError(`Salary rule with ID '${id}' not found`);
     }
     return rule;
   }
 
-  async createRule(dto: CreateSalaryRuleDto): Promise<SalaryRule> {
+  async createRule(dto: CreateSalaryRuleDto, client?: SupabaseClient): Promise<SalaryRule> {
     if (dto.calculation_type === 'FORMULA' && dto.formula) {
       SafeFormulaEvaluator.validateFormulaSyntax(dto.formula);
     }
-    return this.repo.createRule(dto);
+    return this.repo.createRule(dto, client);
   }
 
-  async updateRule(id: string, dto: UpdateSalaryRuleDto): Promise<SalaryRule> {
+  async updateRule(id: string, dto: UpdateSalaryRuleDto, client?: SupabaseClient): Promise<SalaryRule> {
     if (dto.calculation_type === 'FORMULA' && dto.formula) {
       SafeFormulaEvaluator.validateFormulaSyntax(dto.formula);
     }
-    const rule = await this.repo.updateRule(id, dto);
+    const rule = await this.repo.updateRule(id, dto, client);
     if (!rule) {
       throw new NotFoundError(`Salary rule with ID '${id}' not found to update`);
     }

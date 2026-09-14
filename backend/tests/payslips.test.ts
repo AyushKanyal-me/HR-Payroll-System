@@ -3,6 +3,7 @@ import request from 'supertest';
 import { app } from '../src/app.js';
 import { authService } from '../src/modules/auth/auth.service.js';
 import { payslipsService } from '../src/modules/payslips/payslips.service.js';
+import { payrollRepository } from '../src/modules/payroll/payroll.repository.js';
 import { EmailService } from '../src/utils/email.js';
 import { generatePayslipPdfBuffer } from '../src/utils/pdf.js';
 import { ForbiddenError, NotFoundError, BadRequestError } from '../src/utils/errors.js';
@@ -177,6 +178,10 @@ describe('Phase 7 — Payslips, PDF & Email Delivery Test Suite', () => {
   describe('Email Delivery & Audit Log', () => {
     it('5. Email configuration failure: returns 400 BadRequestError with controlled message when unconfigured', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(mockAdminUser);
+      vi.spyOn(payslipsService, 'getPayslipById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000701',
+        employee: { company_id: mockAdminUser.companyId }
+      } as any);
       vi.spyOn(payslipsService, 'sendPayslipEmail').mockRejectedValue(
         new BadRequestError('Email delivery is currently not configured on this server.')
       );
@@ -192,6 +197,10 @@ describe('Phase 7 — Payslips, PDF & Email Delivery Test Suite', () => {
 
     it('6. Successful email delivery path: sends email and returns delivery ID', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(mockAdminUser);
+      vi.spyOn(payslipsService, 'getPayslipById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000701',
+        employee: { company_id: mockAdminUser.companyId }
+      } as any);
       vi.spyOn(payslipsService, 'sendPayslipEmail').mockResolvedValue({
         success: true,
         deliveryId: '00000000-0000-0000-0000-000000000801'
@@ -234,6 +243,11 @@ describe('Phase 7 — Payslips, PDF & Email Delivery Test Suite', () => {
 
     it('8. POST /api/v1/payruns/:id/send-payslips: triggers bulk payslip delivery for payrun', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(mockAdminUser);
+      vi.spyOn(payrollRepository, 'findById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000601',
+        company_id: mockAdminUser.companyId,
+        status: 'PAID'
+      } as any);
       vi.spyOn(payslipsService, 'sendBulkPayrunPayslips').mockResolvedValue({
         total: 5,
         sent: 5,

@@ -1,15 +1,19 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import { AuditLogsQueryDto } from './audit-logs.schema.js';
 import { AuditLogEntry } from './audit-logs.types.js';
 import { DatabaseError } from '../../utils/errors.js';
 
 export class AuditLogsRepository {
-  async findAll(query: AuditLogsQueryDto): Promise<{ data: AuditLogEntry[]; total: number }> {
+  async findAll(
+    query: AuditLogsQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<{ data: AuditLogEntry[]; total: number }> {
     const page = query.page || 1;
     const limit = query.limit || 20;
     const offset = (page - 1) * limit;
 
-    let builder = supabaseAdminClient
+    let builder = client
       .from('audit_logs')
       .select(`
         *,
@@ -68,6 +72,42 @@ export class AuditLogsRepository {
       data: (data || []) as AuditLogEntry[],
       total: count || 0
     };
+  }
+
+  async record(
+    entry: {
+      userId?: string | null;
+      action: string;
+      entityType: string;
+      entityId?: string | null;
+      oldValues?: Record<string, any> | null;
+      newValues?: Record<string, any> | null;
+    },
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<AuditLogEntry | null> {
+    try {
+      const { data, error } = await client
+        .from('audit_logs')
+        .insert({
+          user_id: entry.userId || null,
+          action: entry.action,
+          entity_type: entry.entityType,
+          entity_id: entry.entityId || null,
+          old_values: entry.oldValues || null,
+          new_values: entry.newValues || null
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.warn('Failed to record audit log:', error.message);
+        return null;
+      }
+      return data as AuditLogEntry;
+    } catch (err: any) {
+      console.warn('Audit log write error:', err.message);
+      return null;
+    }
   }
 }
 

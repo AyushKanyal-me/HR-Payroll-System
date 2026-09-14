@@ -23,6 +23,7 @@ attendanceRouter.get(
 
 // Quick widget endpoints (Self action for authenticated employee)
 attendanceRouter.get('/quick-status', attendanceController.getQuickStatus);
+attendanceRouter.get('/quick-status/:employeeId', attendanceController.getQuickStatus);
 attendanceRouter.post('/check-in', attendanceController.checkIn);
 attendanceRouter.post('/check-out', attendanceController.checkOut);
 

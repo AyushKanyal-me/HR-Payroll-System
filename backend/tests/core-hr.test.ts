@@ -351,6 +351,15 @@ describe('Phase 3 — Core HR API Test Suite', () => {
 
     it('POST /api/v1/contracts/:id/close transitions contract to EXPIRED', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(mockHrManagerUser);
+      vi.spyOn(contractsService, 'getContractById').mockResolvedValue({
+        id: '00000000-0000-0000-0000-000000000501',
+        employee_id: '00000000-0000-0000-0000-000000000102',
+        status: 'ACTIVE',
+        employee: {
+          id: '00000000-0000-0000-0000-000000000102',
+          company_id: mockHrManagerUser.companyId
+        }
+      } as any);
       vi.spyOn(contractsService, 'closeContract').mockResolvedValue({
         id: '00000000-0000-0000-0000-000000000501',
         employee_id: '00000000-0000-0000-0000-000000000102',

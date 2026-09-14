@@ -19,8 +19,10 @@ export class SalaryRuleEvaluator {
     let totalGross = 0;
     let totalDeductions = 0;
 
-    // Evaluate in strict ascending sequence
-    for (const { rule, sequence } of rules) {
+    // Sort rules strictly in ascending sequence
+    const sortedRules = [...rules].sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+
+    for (const { rule, sequence } of sortedRules) {
       let amount = 0;
       let snapshotDetail: Record<string, unknown> = {};
 
@@ -31,10 +33,58 @@ export class SalaryRuleEvaluator {
           break;
 
         case 'PERCENTAGE': {
-          const base = context['BASIC'] ?? context['GROSS'] ?? context['WAGE'] ?? 0;
           const pct = Number(rule.percentage || 0);
+          let base = 0;
+          let baseSource = '';
+
+          if (rule.formula && rule.formula.trim()) {
+            const trimmedFormula = rule.formula.trim();
+            // If formula contains operators, evaluate formula directly
+            if (/[+\-*/()]/.test(trimmedFormula)) {
+              amount = SafeFormulaEvaluator.evaluate(trimmedFormula, context);
+              snapshotDetail = { type: 'PERCENTAGE_FORMULA', formula: trimmedFormula, result: amount };
+              break;
+            } else {
+              // Formula specifies base variable name (e.g. 'BASIC', 'GROSS', 'WAGE', etc.)
+              const baseVar = trimmedFormula.toUpperCase();
+              base = context[baseVar] ?? 0;
+              baseSource = baseVar;
+            }
+          } else {
+            // Flexible base resolution according to category and available context
+            if (rule.category === 'DEDUCTION') {
+              if (context['BASIC'] !== undefined && rule.code === 'PF') {
+                base = context['BASIC'];
+                baseSource = 'BASIC';
+              } else if (context['GROSS'] !== undefined) {
+                base = context['GROSS'];
+                baseSource = 'GROSS';
+              } else if (context['BASIC'] !== undefined) {
+                base = context['BASIC'];
+                baseSource = 'BASIC';
+              } else {
+                base = context['WAGE'] ?? 0;
+                baseSource = 'WAGE';
+              }
+            } else if (rule.category === 'ALLOWANCE') {
+              if (context['BASIC'] !== undefined) {
+                base = context['BASIC'];
+                baseSource = 'BASIC';
+              } else {
+                base = context['WAGE'] ?? 0;
+                baseSource = 'WAGE';
+              }
+            } else if (rule.category === 'BASIC') {
+              base = context['WAGE'] ?? 0;
+              baseSource = 'WAGE';
+            } else {
+              base = context['BASIC'] ?? context['GROSS'] ?? context['WAGE'] ?? 0;
+              baseSource = 'DEFAULT';
+            }
+          }
+
           amount = Number(((base * pct) / 100).toFixed(2));
-          snapshotDetail = { type: 'PERCENTAGE', base, percentage: pct, calculated: amount };
+          snapshotDetail = { type: 'PERCENTAGE', base, baseSource, percentage: pct, calculated: amount };
           break;
         }
 
@@ -47,13 +97,15 @@ export class SalaryRuleEvaluator {
         }
       }
 
-      // Add to context with rule code
+      // Add to context with rule code and uppercase rule code
       context[rule.code] = amount;
+      context[rule.code.toUpperCase()] = amount;
 
-      if (rule.category === 'BASIC' || rule.category === 'ALLOWANCE' || rule.category === 'GROSS') {
-        if (rule.category !== 'GROSS') {
-          totalGross += amount;
-        }
+      if (rule.category === 'BASIC' || rule.category === 'ALLOWANCE') {
+        totalGross += amount;
+      } else if (rule.category === 'GROSS') {
+        // If an explicit GROSS rule was evaluated, respect its calculated amount
+        totalGross = amount;
       } else if (rule.category === 'DEDUCTION') {
         totalDeductions += amount;
       }
@@ -66,10 +118,10 @@ export class SalaryRuleEvaluator {
       });
     }
 
-    // Determine gross and net if not explicitly overridden
+    // Determine gross, deductions and net
     const gross = context['GROSS'] !== undefined ? context['GROSS'] : Number(totalGross.toFixed(2));
-    const deductions = context['DEDUCTIONS'] !== undefined ? context['DEDUCTIONS'] : Number(totalDeductions.toFixed(2));
-    const net = context['NET'] !== undefined ? context['NET'] : Number((gross - deductions).toFixed(2));
+    let deductions = context['DEDUCTIONS'] !== undefined ? context['DEDUCTIONS'] : Number(totalDeductions.toFixed(2));
+    let net = context['NET'] !== undefined ? context['NET'] : Number((gross - deductions).toFixed(2));
 
     return {
       evaluatedRules,
@@ -80,3 +132,4 @@ export class SalaryRuleEvaluator {
     };
   }
 }
+

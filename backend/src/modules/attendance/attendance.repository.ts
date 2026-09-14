@@ -1,3 +1,4 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { supabaseAdminClient } from '../../config/supabase.js';
 import {
   AttendanceRecord,
@@ -8,8 +9,11 @@ import {
 import { DatabaseError, ConflictError } from '../../utils/errors.js';
 
 export class AttendanceRepository {
-  async findAll(query: AttendanceQueryDto): Promise<{ data: AttendanceRecord[]; total: number }> {
-    let queryBuilder = supabaseAdminClient
+  async findAll(
+    query: AttendanceQueryDto,
+    client: SupabaseClient = supabaseAdminClient
+  ): Promise<{ data: AttendanceRecord[]; total: number }> {
+    let queryBuilder = client
       .from('attendance')
       .select(`
         *,
@@ -17,7 +21,8 @@ export class AttendanceRepository {
           id,
           first_name,
           last_name,
-          work_email
+          work_email,
+          company_id
         )
       `, { count: 'exact' });
 
@@ -55,8 +60,8 @@ export class AttendanceRepository {
     };
   }
 
-  async findById(id: string): Promise<AttendanceRecord | null> {
-    const { data, error } = await supabaseAdminClient
+  async findById(id: string, client: SupabaseClient = supabaseAdminClient): Promise<AttendanceRecord | null> {
+    const { data, error } = await client
       .from('attendance')
       .select(`
         *,
@@ -64,7 +69,8 @@ export class AttendanceRepository {
           id,
           first_name,
           last_name,
-          work_email
+          work_email,
+          company_id
         )
       `)
       .eq('id', id)
@@ -77,8 +83,8 @@ export class AttendanceRepository {
     return data as AttendanceRecord | null;
   }
 
-  async findByEmployeeAndDate(employeeId: string, date: string): Promise<AttendanceRecord | null> {
-    const { data, error } = await supabaseAdminClient
+  async findByEmployeeAndDate(employeeId: string, date: string, client: SupabaseClient = supabaseAdminClient): Promise<AttendanceRecord | null> {
+    const { data, error } = await client
       .from('attendance')
       .select('*')
       .eq('employee_id', employeeId)
@@ -92,13 +98,13 @@ export class AttendanceRepository {
     return data as AttendanceRecord | null;
   }
 
-  async create(dto: CreateManualAttendanceDto): Promise<AttendanceRecord> {
-    const { data, error } = await supabaseAdminClient
+  async create(dto: CreateManualAttendanceDto, client: SupabaseClient = supabaseAdminClient): Promise<AttendanceRecord> {
+    const { data, error } = await client
       .from('attendance')
       .insert(dto)
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email)
+        employee:employees (id, first_name, last_name, work_email, company_id)
       `)
       .single();
 
@@ -112,14 +118,14 @@ export class AttendanceRepository {
     return data as AttendanceRecord;
   }
 
-  async update(id: string, dto: UpdateAttendanceDto): Promise<AttendanceRecord | null> {
-    const { data, error } = await supabaseAdminClient
+  async update(id: string, dto: UpdateAttendanceDto, client: SupabaseClient = supabaseAdminClient): Promise<AttendanceRecord | null> {
+    const { data, error } = await client
       .from('attendance')
       .update(dto)
       .eq('id', id)
       .select(`
         *,
-        employee:employees (id, first_name, last_name, work_email)
+        employee:employees (id, first_name, last_name, work_email, company_id)
       `)
       .maybeSingle();
 
@@ -130,8 +136,8 @@ export class AttendanceRepository {
     return data as AttendanceRecord | null;
   }
 
-  async delete(id: string): Promise<boolean> {
-    const { error } = await supabaseAdminClient
+  async delete(id: string, client: SupabaseClient = supabaseAdminClient): Promise<boolean> {
+    const { error } = await client
       .from('attendance')
       .delete()
       .eq('id', id);

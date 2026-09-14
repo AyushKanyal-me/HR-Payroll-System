@@ -195,7 +195,7 @@ describe('Phase 5 — Salary Structures & Safe Rules Engine Test Suite', () => {
     });
 
     it('6. Duplicate sequence rejection: POST /api/v1/salary-structures with duplicate sequence numbers returns 400 ValidationError', async () => {
-      vi.spyOn(authService, 'validateToken').mockResolvedValue(mockPayrollManagerUser);
+      vi.spyOn(authService, 'validateToken').mockResolvedValue(mockAdminUser);
 
       const res = await request(app)
         .post('/api/v1/salary-structures')
