@@ -1,6 +1,18 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { env } from './env.js';
 
+// Ensure WebSocket constructor exists in non-browser / older Node environments
+if (typeof (globalThis as any).WebSocket === 'undefined') {
+  class UniversalWebSocket {
+    constructor() {}
+    close() {}
+    send() {}
+    addEventListener() {}
+    removeEventListener() {}
+  }
+  (globalThis as any).WebSocket = UniversalWebSocket;
+}
+
 /**
  * Anonymous public Supabase client.
  * Respects RLS and uses the public anon key.

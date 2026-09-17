@@ -3,6 +3,8 @@ import request from 'supertest';
 import { app } from '../src/app.js';
 import { authService } from '../src/modules/auth/auth.service.js';
 import { payrollService } from '../src/modules/payroll/payroll.service.js';
+import { companiesService } from '../src/modules/companies/companies.service.js';
+import { employeesService } from '../src/modules/employees/employees.service.js';
 import { SafeFormulaEvaluator } from '../src/modules/salary/salary.evaluator.js';
 import { SalaryRuleEvaluator } from '../src/modules/payroll/engine/SalaryRuleEvaluator.js';
 import { DeductionCalculator } from '../src/modules/payroll/engine/DeductionCalculator.js';
@@ -181,10 +183,14 @@ describe('FINAL INTEGRATION TEST SUITE — PEOPLEPAY360', () => {
 
     it('ALLOW: ADMIN has full access across modules', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(adminUser);
+      vi.spyOn(companiesService, 'getCompanies').mockResolvedValue([
+        { id: companyA, name: 'Acme Corp', created_at: new Date().toISOString() } as any
+      ]);
       const res = await request(app)
         .get('/api/v1/companies')
         .set('Authorization', 'Bearer admin-jwt');
-      expect(res.status).not.toBe(403);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
     });
   });
 
@@ -194,10 +200,19 @@ describe('FINAL INTEGRATION TEST SUITE — PEOPLEPAY360', () => {
   describe('3. Employee Self-Service Access Boundaries', () => {
     it('ALLOW: Employee A accessing their own employee profile', async () => {
       vi.spyOn(authService, 'validateToken').mockResolvedValue(employeeA);
+      vi.spyOn(employeesService, 'getEmployeeById').mockResolvedValue({
+        id: employeeA.employeeId,
+        company_id: companyA,
+        first_name: 'Employee',
+        last_name: 'A',
+        work_email: 'emp.a@company-a.com',
+        status: 'ACTIVE'
+      } as any);
       const res = await request(app)
         .get(`/api/v1/employees/${employeeA.employeeId}`)
         .set('Authorization', 'Bearer emp-a-jwt');
-      expect(res.status).not.toBe(403);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
     });
 
     it('DENY: Employee A attempting to access Employee B private profile returns 403 Forbidden', async () => {
