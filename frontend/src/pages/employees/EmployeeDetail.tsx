@@ -185,26 +185,27 @@ export const EmployeeDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Smart Buttons (Odoo-style Counters) */}
+        {/* Smart Buttons (Editorial Styled Counters) */}
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           <button
             onClick={() => navigate('/contracts?employee_id=' + employee.id)}
             style={{
               padding: '10px 16px',
-              borderRadius: '8px',
-              backgroundColor: '#18181b',
+              borderRadius: '0.375em',
+              backgroundColor: 'var(--bg-sidebar)',
               border: '1px solid var(--border-subtle)',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               minWidth: '85px',
+              transition: 'all 0.2s ease-in-out',
             }}
           >
-            <span style={{ fontSize: '1.125rem', fontWeight: 800, color: 'var(--primary-red)' }}>
+            <span style={{ fontSize: '1.125rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--primary-red)' }}>
               {smartCounts?.contracts_count ?? 0}
             </span>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginTop: '2px' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>
               Contracts
             </span>
           </button>
@@ -213,20 +214,21 @@ export const EmployeeDetail: React.FC = () => {
             onClick={() => navigate('/attendance?employee_id=' + employee.id)}
             style={{
               padding: '10px 16px',
-              borderRadius: '8px',
-              backgroundColor: '#18181b',
+              borderRadius: '0.375em',
+              backgroundColor: 'var(--bg-sidebar)',
               border: '1px solid var(--border-subtle)',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               minWidth: '85px',
+              transition: 'all 0.2s ease-in-out',
             }}
           >
-            <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#3b82f6' }}>
+            <span style={{ fontSize: '1.125rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--primary-red)' }}>
               {smartCounts?.attendance_count ?? 0}
             </span>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginTop: '2px' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>
               Attendance
             </span>
           </button>
@@ -235,20 +237,21 @@ export const EmployeeDetail: React.FC = () => {
             onClick={() => navigate('/time-off?employee_id=' + employee.id)}
             style={{
               padding: '10px 16px',
-              borderRadius: '8px',
-              backgroundColor: '#18181b',
+              borderRadius: '0.375em',
+              backgroundColor: 'var(--bg-sidebar)',
               border: '1px solid var(--border-subtle)',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               minWidth: '85px',
+              transition: 'all 0.2s ease-in-out',
             }}
           >
-            <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#f59e0b' }}>
+            <span style={{ fontSize: '1.125rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--status-warning)' }}>
               {smartCounts?.time_off_requests_count ?? 0}
             </span>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginTop: '2px' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>
               Time Off
             </span>
           </button>
@@ -257,20 +260,21 @@ export const EmployeeDetail: React.FC = () => {
             onClick={() => navigate('/payslips?employee_id=' + employee.id)}
             style={{
               padding: '10px 16px',
-              borderRadius: '8px',
-              backgroundColor: '#18181b',
+              borderRadius: '0.375em',
+              backgroundColor: 'var(--bg-sidebar)',
               border: '1px solid var(--border-subtle)',
               cursor: 'pointer',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               minWidth: '85px',
+              transition: 'all 0.2s ease-in-out',
             }}
           >
-            <span style={{ fontSize: '1.125rem', fontWeight: 800, color: '#10b981' }}>
+            <span style={{ fontSize: '1.125rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--status-success)' }}>
               {smartCounts?.payslips_count ?? 0}
             </span>
-            <span style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', textTransform: 'uppercase', marginTop: '2px' }}>
+            <span style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '2px' }}>
               Payslips
             </span>
           </button>
@@ -359,10 +363,10 @@ export const EmployeeDetail: React.FC = () => {
               style={{
                 width: '100%',
                 padding: '10px 14px',
-                borderRadius: '8px',
-                backgroundColor: '#18181b',
+                borderRadius: '0.375em',
+                backgroundColor: 'var(--bg-input)',
                 border: '1px solid var(--border-subtle)',
-                color: '#ffffff',
+                color: 'var(--text-main)',
                 fontSize: '0.875rem',
                 outline: 'none',
               }}
@@ -379,14 +383,14 @@ export const EmployeeDetail: React.FC = () => {
             <div
               style={{
                 padding: '12px 16px',
-                borderRadius: '8px',
+                borderRadius: '0.375em',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
                 fontSize: '0.875rem',
-                backgroundColor: inviteStatus.type === 'success' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
-                border: `1px solid ${inviteStatus.type === 'success' ? '#10b981' : '#ef4444'}`,
-                color: inviteStatus.type === 'success' ? '#10b981' : '#ef4444',
+                backgroundColor: inviteStatus.type === 'success' ? 'var(--status-success-bg)' : 'var(--status-danger-bg)',
+                border: `1px solid ${inviteStatus.type === 'success' ? 'var(--status-success)' : 'var(--status-danger)'}`,
+                color: inviteStatus.type === 'success' ? 'var(--status-success)' : 'var(--status-danger)',
               }}
             >
               {inviteStatus.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
@@ -398,8 +402,8 @@ export const EmployeeDetail: React.FC = () => {
             <div
               style={{
                 padding: '14px',
-                borderRadius: '8px',
-                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '0.375em',
+                backgroundColor: 'var(--bg-sidebar)',
                 border: '1px solid var(--border-subtle)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -407,23 +411,23 @@ export const EmployeeDetail: React.FC = () => {
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
                   Direct Activation Link (Instant Access)
                 </span>
-                <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 600 }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--status-success)', fontWeight: 600 }}>
                   Ready to activate
                 </span>
               </div>
               <div
                 style={{
                   padding: '8px 12px',
-                  backgroundColor: '#09090b',
-                  borderRadius: '6px',
+                  backgroundColor: 'var(--bg-input)',
+                  borderRadius: '0.375em',
                   border: '1px solid var(--border-subtle)',
                   color: 'var(--text-muted)',
                   fontSize: '0.75rem',
                   wordBreak: 'break-all',
-                  fontFamily: 'monospace',
+                  fontFamily: 'var(--font-mono)',
                   maxHeight: '60px',
                   overflowY: 'auto',
                 }}

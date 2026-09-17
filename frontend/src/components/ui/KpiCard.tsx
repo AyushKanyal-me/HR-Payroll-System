@@ -24,12 +24,12 @@ export const KpiCard: React.FC<KpiCardProps> = ({
     <div
       className="card-luxury card-luxury-interactive"
       style={{
-        padding: '20px',
+        padding: '22px',
         position: 'relative',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
+        gap: '10px',
       }}
     >
       {/* Top accent line */}
@@ -39,22 +39,30 @@ export const KpiCard: React.FC<KpiCardProps> = ({
           top: 0,
           left: 0,
           right: 0,
-          height: '2px',
+          height: '3px',
           backgroundColor: accentColor,
-          opacity: 0.8,
         }}
       />
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+        <span
+          style={{
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            fontFamily: 'var(--font-heading)',
+            color: 'var(--text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          }}
+        >
           {title}
         </span>
         {icon && (
           <div
             style={{
               padding: '8px',
-              borderRadius: '8px',
-              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              borderRadius: '6px',
+              backgroundColor: 'var(--primary-red-subtle)',
               border: '1px solid var(--border-subtle)',
               color: accentColor,
               display: 'flex',
@@ -67,8 +75,16 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         )}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.03em' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', marginTop: '2px' }}>
+        <h2
+          style={{
+            fontSize: '1.75rem',
+            fontWeight: 700,
+            fontFamily: 'var(--font-heading)',
+            color: 'var(--text-main)',
+            letterSpacing: '-0.02em',
+          }}
+        >
           {value}
         </h2>
         {trend && (
@@ -85,7 +101,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       </div>
 
       {subtitle && (
-        <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
           {subtitle}
         </p>
       )}

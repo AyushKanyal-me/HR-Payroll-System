@@ -16,7 +16,6 @@ import {
   Receipt,
   FileSearch,
   Settings,
-  UserCircle,
   LogOut,
   Sparkles,
 } from 'lucide-react';
@@ -44,10 +43,10 @@ export const Sidebar: React.FC = () => {
       {
         title: 'MY PORTAL',
         items: [
-          { to: '/portal', label: 'My Dashboard', icon: <LayoutDashboard size={18} /> },
-          { to: '/my-attendance', label: 'My Attendance', icon: <Clock size={18} /> },
-          { to: '/my-time-off', label: 'My Time Off', icon: <CalendarDays size={18} /> },
-          { to: '/my-payslips', label: 'My Payslips', icon: <Receipt size={18} /> },
+          { to: '/portal', label: 'My Dashboard', icon: <LayoutDashboard size={17} /> },
+          { to: '/my-attendance', label: 'My Attendance', icon: <Clock size={17} /> },
+          { to: '/my-time-off', label: 'My Time Off', icon: <CalendarDays size={17} /> },
+          { to: '/my-payslips', label: 'My Payslips', icon: <Receipt size={17} /> },
         ],
       },
     ];
@@ -56,36 +55,36 @@ export const Sidebar: React.FC = () => {
     navSections = [
       {
         items: [
-          { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
+          { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={17} /> },
         ],
       },
       {
         title: 'MY SELF-SERVICE',
         items: [
-          { to: '/portal', label: 'My Portal', icon: <LayoutDashboard size={18} /> },
-          { to: '/my-attendance', label: 'My Attendance', icon: <Clock size={18} /> },
-          { to: '/my-time-off', label: 'My Time Off', icon: <CalendarDays size={18} /> },
-          { to: '/my-payslips', label: 'My Payslips', icon: <Receipt size={18} /> },
+          { to: '/portal', label: 'My Portal', icon: <LayoutDashboard size={17} /> },
+          { to: '/my-attendance', label: 'My Attendance', icon: <Clock size={17} /> },
+          { to: '/my-time-off', label: 'My Time Off', icon: <CalendarDays size={17} /> },
+          { to: '/my-payslips', label: 'My Payslips', icon: <Receipt size={17} /> },
         ],
       },
       {
         title: 'CORE HR',
         items: [
-          { to: '/employees', label: 'Employees', icon: <Users size={18} /> },
-          { to: '/contracts', label: 'Contracts', icon: <FileSignature size={18} /> },
-          { to: '/departments', label: 'Departments', icon: <Building2 size={18} /> },
-          { to: '/positions', label: 'Job Positions', icon: <Briefcase size={18} /> },
-          { to: '/schedules', label: 'Schedules', icon: <CalendarRange size={18} /> },
+          { to: '/employees', label: 'Employees', icon: <Users size={17} /> },
+          { to: '/contracts', label: 'Contracts', icon: <FileSignature size={17} /> },
+          { to: '/departments', label: 'Departments', icon: <Building2 size={17} /> },
+          { to: '/positions', label: 'Job Positions', icon: <Briefcase size={17} /> },
+          { to: '/schedules', label: 'Schedules', icon: <CalendarRange size={17} /> },
         ],
       },
       {
         title: 'TIME & ATTENDANCE',
         items: [
-          { to: '/attendance', label: 'Attendance', icon: <Clock size={18} /> },
+          { to: '/attendance', label: 'Attendance', icon: <Clock size={17} /> },
           ...((isAdmin || isHR)
             ? [
-                { to: '/time-off', label: 'Time Off Requests', icon: <CalendarDays size={18} /> },
-                { to: '/time-off-allocations', label: 'Leave Allocations', icon: <Sparkles size={18} /> },
+                { to: '/time-off', label: 'Time Off Requests', icon: <CalendarDays size={17} /> },
+                { to: '/time-off-allocations', label: 'Leave Allocations', icon: <Sparkles size={17} /> },
               ]
             : []),
         ],
@@ -93,10 +92,10 @@ export const Sidebar: React.FC = () => {
       {
         title: 'PAYROLL & SALARY',
         items: [
-          { to: '/payroll', label: 'Payrun Engine', icon: <Banknote size={18} /> },
-          { to: '/payslips', label: 'Payslips Archive', icon: <Receipt size={18} /> },
-          { to: '/salary-structures', label: 'Salary Structures', icon: <Layers size={18} /> },
-          { to: '/salary-rules', label: 'Salary Rules', icon: <Calculator size={18} /> },
+          { to: '/payroll', label: 'Payrun Engine', icon: <Banknote size={17} /> },
+          { to: '/payslips', label: 'Payslips Archive', icon: <Receipt size={17} /> },
+          { to: '/salary-structures', label: 'Salary Structures', icon: <Layers size={17} /> },
+          { to: '/salary-rules', label: 'Salary Rules', icon: <Calculator size={17} /> },
         ],
       },
       ...((isAdmin || isHR)
@@ -104,8 +103,8 @@ export const Sidebar: React.FC = () => {
             {
               title: 'SYSTEM',
               items: [
-                { to: '/audit-logs', label: 'Audit Logs', icon: <FileSearch size={18} /> },
-                ...(isAdmin ? [{ to: '/settings', label: 'Settings', icon: <Settings size={18} /> }] : []),
+                { to: '/audit-logs', label: 'Audit Logs', icon: <FileSearch size={17} /> },
+                ...(isAdmin ? [{ to: '/settings', label: 'Settings', icon: <Settings size={17} /> }] : []),
               ],
             },
           ]
@@ -117,7 +116,7 @@ export const Sidebar: React.FC = () => {
     <aside
       style={{
         width: '260px',
-        backgroundColor: '#101012',
+        backgroundColor: 'var(--bg-sidebar)',
         borderRight: '1px solid var(--border-subtle)',
         display: 'flex',
         flexDirection: 'column',
@@ -126,12 +125,13 @@ export const Sidebar: React.FC = () => {
         top: 0,
         flexShrink: 0,
         zIndex: 30,
+        transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
       }}
     >
       {/* Brand Header */}
       <div
         style={{
-          padding: '24px 20px',
+          padding: '22px 20px',
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
@@ -142,21 +142,32 @@ export const Sidebar: React.FC = () => {
           style={{
             width: '36px',
             height: '36px',
-            borderRadius: '8px',
-            background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+            borderRadius: '0.375em',
+            backgroundColor: 'var(--primary-red)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 15px rgba(220, 38, 38, 0.4)',
+            boxShadow: '0 2px 8px rgba(245, 106, 106, 0.3)',
           }}
         >
           <Banknote size={20} color="#ffffff" />
         </div>
         <div>
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: '1rem', fontWeight: 800, color: '#f4f4f5', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '1.05rem',
+              fontWeight: 700,
+              color: 'var(--text-main)',
+              letterSpacing: '-0.01em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
             HR Pay<span style={{ color: 'var(--primary-red)' }}> 360</span>
           </div>
-          <div style={{ fontSize: '0.6875rem', color: 'var(--text-dim)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '0.6875rem', color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 600 }}>
             HR & Payroll Platform
           </div>
         </div>
@@ -170,15 +181,16 @@ export const Sidebar: React.FC = () => {
           padding: '16px 12px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '20px',
+          gap: '18px',
         }}
       >
         {navSections.map((section, sIdx) => (
-          <div key={sIdx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div key={sIdx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             {section.title && (
               <div
                 style={{
                   fontSize: '0.6875rem',
+                  fontFamily: 'var(--font-heading)',
                   fontWeight: 700,
                   color: 'var(--text-dim)',
                   textTransform: 'uppercase',
@@ -197,20 +209,20 @@ export const Sidebar: React.FC = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '12px',
-                  padding: '9px 12px',
-                  borderRadius: '8px',
-                  fontSize: '0.875rem',
-                  fontWeight: isActive ? 600 : 500,
-                  color: isActive ? '#ffffff' : 'var(--text-muted)',
+                  padding: '8px 12px',
+                  borderRadius: '0.375em',
+                  fontSize: '0.85rem',
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? 'var(--primary-red)' : 'var(--text-main)',
                   backgroundColor: isActive ? 'var(--primary-red-subtle)' : 'transparent',
-                  border: isActive ? '1px solid var(--border-accent)' : '1px solid transparent',
+                  borderLeft: isActive ? '3px solid var(--primary-red)' : '3px solid transparent',
                   textDecoration: 'none',
-                  transition: 'all 0.15s ease',
+                  transition: 'all 0.2s ease-in-out',
                 })}
               >
                 {({ isActive }) => (
                   <>
-                    <div style={{ color: isActive ? 'var(--primary-red)' : 'var(--text-dim)', display: 'flex' }}>
+                    <div style={{ color: isActive ? 'var(--primary-red)' : 'var(--text-muted)', display: 'flex' }}>
                       {item.icon}
                     </div>
                     <span>{item.label}</span>
@@ -225,9 +237,9 @@ export const Sidebar: React.FC = () => {
       {/* User Bottom Info & Logout */}
       <div
         style={{
-          padding: '16px',
+          padding: '14px 16px',
           borderTop: '1px solid var(--border-subtle)',
-          backgroundColor: '#0c0c0e',
+          backgroundColor: 'var(--bg-sidebar-alt)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -239,14 +251,15 @@ export const Sidebar: React.FC = () => {
               width: '34px',
               height: '34px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(220, 38, 38, 0.15)',
-              border: '1px solid rgba(220, 38, 38, 0.4)',
+              backgroundColor: 'var(--primary-red-subtle)',
+              border: '1.5px solid var(--primary-red)',
               color: 'var(--primary-red)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '0.8125rem',
               fontWeight: 700,
+              fontFamily: 'var(--font-heading)',
               flexShrink: 0,
             }}
           >
@@ -256,7 +269,7 @@ export const Sidebar: React.FC = () => {
             <div style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-main)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {user?.firstName ? user.firstName + ' ' + (user.lastName || '') : user?.email}
             </div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--primary-red)', fontWeight: 600, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.6875rem', color: 'var(--primary-red)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {user?.roles?.[0] || 'EMPLOYEE'}
             </div>
           </div>
@@ -268,16 +281,22 @@ export const Sidebar: React.FC = () => {
           style={{
             background: 'none',
             border: 'none',
-            color: 'var(--text-dim)',
+            color: 'var(--text-muted)',
             cursor: 'pointer',
             padding: '6px',
-            borderRadius: '6px',
+            borderRadius: '4px',
             display: 'flex',
             alignItems: 'center',
-            transition: 'color 0.15s ease',
+            transition: 'all 0.2s ease-in-out',
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--primary-red)')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-dim)')}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--primary-red)';
+            e.currentTarget.style.backgroundColor = 'var(--primary-red-subtle)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--text-muted)';
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
         >
           <LogOut size={16} />
         </button>

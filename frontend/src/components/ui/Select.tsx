@@ -23,9 +23,11 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           <label
             htmlFor={selectId}
             style={{
-              fontSize: '0.8125rem',
-              fontWeight: 500,
-              color: 'var(--text-muted)',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--text-main)',
+              letterSpacing: '0.02em',
             }}
           >
             {label}
@@ -37,9 +39,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ref={ref}
             style={{
               width: '100%',
-              backgroundColor: '#121214',
+              backgroundColor: 'var(--bg-input)',
               border: '1px solid ' + (error ? 'var(--status-danger)' : 'var(--border-subtle)'),
-              borderRadius: '8px',
+              borderRadius: '0.375em',
               padding: '10px 36px 10px 14px',
               color: 'var(--text-main)',
               fontSize: '0.875rem',
@@ -47,13 +49,24 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
               appearance: 'none',
               fontFamily: 'var(--font-sans)',
               cursor: 'pointer',
+              transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
               ...style,
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = error ? 'var(--status-danger)' : 'var(--primary-red)';
+              e.currentTarget.style.boxShadow = error
+                ? '0 0 0 1px var(--status-danger)'
+                : '0 0 0 1px var(--primary-red)';
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = error ? 'var(--status-danger)' : 'var(--border-subtle)';
+              e.currentTarget.style.boxShadow = 'none';
             }}
             {...props}
           >
             {placeholder && <option value="">{placeholder}</option>}
             {options.map((opt) => (
-              <option key={opt.value} value={opt.value} style={{ backgroundColor: '#18181b', color: '#f4f4f5' }}>
+              <option key={opt.value} value={opt.value} style={{ backgroundColor: 'var(--bg-surface)', color: 'var(--text-main)' }}>
                 {opt.label}
               </option>
             ))}

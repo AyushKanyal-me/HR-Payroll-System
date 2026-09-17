@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext';
+import { useTheme } from '../../context/ThemeContext';
 import { companiesApi } from '../../api/endpoints';
 import { Company } from '../../types';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { Select } from '../../components/ui/Select';
-import { Settings, Building2, Shield, Bell, Database } from 'lucide-react';
+import { Settings, Building2, Shield, Database, Palette, Sun, Moon } from 'lucide-react';
 
 export const SettingsPage: React.FC = () => {
   const toast = useToast();
+  const { theme, setTheme } = useTheme();
   const [company, setCompany] = useState<Company | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -62,8 +64,8 @@ export const SettingsPage: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <Settings size={22} color="var(--primary-red)" />
         <div>
-          <h1 style={{ fontSize: '1.35rem', fontWeight: 800 }}>Platform Settings</h1>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+          <h1 style={{ fontSize: '1.45rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-main)' }}>Platform Settings</h1>
+          <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)' }}>
             Enterprise entity configuration, payroll parameters & system preferences
           </p>
         </div>
@@ -71,22 +73,78 @@ export const SettingsPage: React.FC = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px' }}>
         {/* Settings Navigation / Side Info */}
-        <div className="card-luxury" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px', height: 'fit-content' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-red)', fontWeight: 700, fontSize: '0.875rem' }}>
-            <Building2 size={16} /> Legal Entity & Entity Profile
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="card-luxury" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--primary-red)', fontWeight: 700, fontSize: '0.875rem' }}>
+              <Building2 size={16} /> Legal Entity Profile
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+              <Shield size={16} /> Security & RLS Policies
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+              <Database size={16} /> Supabase Connectivity
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            <Shield size={16} /> Security & RLS Policies
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            <Database size={16} /> Supabase Connectivity
+
+          {/* Theme Mode Setting Card */}
+          <div className="card-luxury" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-main)', fontWeight: 700, fontFamily: 'var(--font-heading)', fontSize: '0.9rem' }}>
+              <Palette size={16} color="var(--primary-red)" /> Appearance & Theme
+            </div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Choose your preferred visual appearance mode.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setTheme('light')}
+                style={{
+                  padding: '10px',
+                  borderRadius: '0.375em',
+                  border: theme === 'light' ? '2px solid var(--primary-red)' : '1px solid var(--border-subtle)',
+                  backgroundColor: theme === 'light' ? 'var(--primary-red-subtle)' : 'var(--bg-sidebar)',
+                  color: theme === 'light' ? 'var(--primary-red)' : 'var(--text-main)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                <Sun size={15} /> Light (Editorial)
+              </button>
+              <button
+                type="button"
+                onClick={() => setTheme('dark')}
+                style={{
+                  padding: '10px',
+                  borderRadius: '0.375em',
+                  border: theme === 'dark' ? '2px solid var(--primary-red)' : '1px solid var(--border-subtle)',
+                  backgroundColor: theme === 'dark' ? 'var(--primary-red-subtle)' : 'var(--bg-sidebar)',
+                  color: theme === 'dark' ? 'var(--primary-red)' : 'var(--text-main)',
+                  fontWeight: 600,
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease-in-out',
+                }}
+              >
+                <Moon size={15} /> Dark Mode
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Company Settings Form */}
         <div className="card-luxury" style={{ padding: '28px' }}>
           <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-main)', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '12px' }}>
               Company Legal Entity
             </h3>
 

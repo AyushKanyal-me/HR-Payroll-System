@@ -4,8 +4,7 @@ import { QuickCheckInCard } from '../../components/employee-portal/QuickCheckInC
 import { LeaveBalanceCard } from '../../components/employee-portal/LeaveBalanceCard';
 import { RecentPayslipsCard } from '../../components/employee-portal/RecentPayslipsCard';
 import { getInitials } from '../../utils/formatters';
-import { User, Briefcase, Building2, Mail } from 'lucide-react';
-import { DoodleHalfTree } from '../../components/doodles/DoodleArt';
+import { Briefcase, Mail } from 'lucide-react';
 
 export const EmployeePortal: React.FC = () => {
   const { user } = useAuth();
@@ -16,55 +15,52 @@ export const EmployeePortal: React.FC = () => {
       <div
         className="card-luxury"
         style={{
-          padding: '24px',
+          padding: '24px 28px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          background: 'linear-gradient(135deg, #18181b 0%, #121214 100%)',
+          backgroundColor: 'var(--bg-surface)',
           borderLeft: '4px solid var(--primary-red)',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Golden Plain Half Tree Doodle */}
-        <div
-          style={{
-            position: 'absolute',
-            right: '25px',
-            top: '-15px',
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}
-        >
-          <DoodleHalfTree size={160} color="#d4af37" opacity={0.75} />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
           <div
             style={{
               width: '54px',
               height: '54px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(220, 38, 38, 0.15)',
-              border: '2px solid rgba(220, 38, 38, 0.4)',
+              backgroundColor: 'var(--primary-red-subtle)',
+              border: '2px solid var(--primary-red)',
               color: 'var(--primary-red)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '1.25rem',
-              fontWeight: 800,
+              fontWeight: 700,
+              fontFamily: 'var(--font-heading)',
             }}
           >
             {getInitials(user?.firstName, user?.lastName)}
           </div>
           <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#f4f4f5' }}>
+            <h2
+              style={{
+                fontSize: '1.35rem',
+                fontWeight: 700,
+                fontFamily: 'var(--font-heading)',
+                color: 'var(--text-main)',
+                letterSpacing: '-0.01em',
+              }}
+            >
               Welcome back, {user?.firstName || 'Colleague'}
             </h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <Mail size={14} color="var(--text-dim)" /> {user?.email}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '4px', fontFamily: 'var(--font-sans)' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Mail size={14} color="var(--primary-red)" /> {user?.email}
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                 <Briefcase size={14} color="var(--text-dim)" /> Employee Portal
               </span>
             </div>

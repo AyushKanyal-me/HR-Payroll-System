@@ -31,7 +31,7 @@ export const RecentPayslipsCard: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Receipt size={18} color="var(--primary-red)" />
-          <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Recent Payslips</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-main)' }}>Recent Payslips</h3>
         </div>
       </div>
 
@@ -49,8 +49,8 @@ export const RecentPayslipsCard: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '12px 14px',
-                backgroundColor: '#141416',
-                borderRadius: '8px',
+                backgroundColor: 'var(--bg-sidebar)',
+                borderRadius: '0.375em',
                 border: '1px solid var(--border-subtle)',
               }}
             >

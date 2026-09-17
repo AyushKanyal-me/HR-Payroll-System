@@ -18,10 +18,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <label
             htmlFor={inputId}
             style={{
-              fontSize: '0.8125rem',
-              fontWeight: 500,
-              color: 'var(--text-muted)',
-              letterSpacing: '0.01em',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--text-main)',
+              letterSpacing: '0.02em',
             }}
           >
             {label}
@@ -47,14 +48,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             style={{
               width: '100%',
-              backgroundColor: '#121214',
+              backgroundColor: 'var(--bg-input)',
               border: '1px solid ' + (error ? 'var(--status-danger)' : 'var(--border-subtle)'),
-              borderRadius: '8px',
+              borderRadius: '0.375em',
               padding: leftIcon ? '10px 14px 10px 38px' : rightIcon ? '10px 38px 10px 14px' : '10px 14px',
               color: 'var(--text-main)',
               fontSize: '0.875rem',
               outline: 'none',
-              transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+              transition: 'border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
               fontFamily: 'var(--font-sans)',
               ...style,
             }}

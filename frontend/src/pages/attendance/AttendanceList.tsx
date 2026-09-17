@@ -211,7 +211,7 @@ export const AttendanceList: React.FC = () => {
               <div style={{ border: '1px solid var(--border-subtle)', borderRadius: '8px', overflow: 'hidden' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.8125rem' }}>
                   <thead>
-                    <tr style={{ backgroundColor: '#18181b', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-dim)' }}>
+                    <tr style={{ backgroundColor: 'var(--bg-sidebar)', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontFamily: 'var(--font-heading)', fontSize: '0.75rem', textTransform: 'uppercase' }}>
                       <th style={{ padding: '10px 12px' }}>#</th>
                       <th style={{ padding: '10px 12px' }}>Check In</th>
                       <th style={{ padding: '10px 12px' }}>Check Out</th>

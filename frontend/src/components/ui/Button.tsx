@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes, ReactNode } from 'react';
+import React, { ButtonHTMLAttributes, ReactNode, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -18,8 +18,12 @@ export const Button: React.FC<ButtonProps> = ({
   rightIcon,
   disabled,
   style,
+  onMouseEnter,
+  onMouseLeave,
   ...props
 }) => {
+  const [isHovered, setIsHovered] = useState(false);
+
   const baseStyle: React.CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
@@ -27,47 +31,57 @@ export const Button: React.FC<ButtonProps> = ({
     gap: '8px',
     fontWeight: 600,
     fontFamily: 'var(--font-sans)',
-    borderRadius: '8px',
-    border: 'none',
+    textTransform: 'uppercase',
+    letterSpacing: '0.075em',
+    borderRadius: '0.375em',
     cursor: disabled || isLoading ? 'not-allowed' : 'pointer',
     opacity: disabled || isLoading ? 0.6 : 1,
-    transition: 'all 0.15s ease',
+    transition: 'all 0.2s ease-in-out',
     textDecoration: 'none',
     outline: 'none',
     whiteSpace: 'nowrap',
+    border: 'none',
   };
 
   const sizeStyles: Record<string, React.CSSProperties> = {
-    sm: { padding: '6px 12px', fontSize: '0.8125rem' },
-    md: { padding: '9px 16px', fontSize: '0.875rem' },
-    lg: { padding: '12px 24px', fontSize: '1rem' },
+    sm: { padding: '6px 14px', fontSize: '0.75rem', height: '32px' },
+    md: { padding: '9px 20px', fontSize: '0.8125rem', height: '40px' },
+    lg: { padding: '12px 28px', fontSize: '0.875rem', height: '48px' },
   };
 
-  const variantStyles: Record<string, React.CSSProperties> = {
-    primary: {
-      backgroundColor: 'var(--primary-red)',
-      color: '#ffffff',
-      boxShadow: '0 4px 14px rgba(220, 38, 38, 0.35)',
-    },
-    secondary: {
-      backgroundColor: '#1c1c20',
-      color: '#f4f4f5',
-      border: '1px solid var(--border-subtle)',
-    },
-    outline: {
-      backgroundColor: 'transparent',
-      color: '#f4f4f5',
-      border: '1px solid var(--border-strong)',
-    },
-    ghost: {
-      backgroundColor: 'transparent',
-      color: 'var(--text-muted)',
-    },
-    danger: {
-      backgroundColor: 'rgba(239, 68, 68, 0.15)',
-      color: '#ef4444',
-      border: '1px solid rgba(239, 68, 68, 0.3)',
-    },
+  const getVariantStyles = (): React.CSSProperties => {
+    switch (variant) {
+      case 'primary':
+        return {
+          backgroundColor: isHovered ? 'var(--primary-red-hover)' : 'var(--primary-red)',
+          color: '#ffffff',
+          boxShadow: isHovered ? '0 4px 12px rgba(245, 106, 106, 0.3)' : 'none',
+        };
+      case 'secondary':
+        return {
+          backgroundColor: isHovered ? 'var(--btn-dark-hover)' : 'var(--btn-dark-bg)',
+          color: '#ffffff',
+        };
+      case 'outline':
+        return {
+          backgroundColor: isHovered ? 'var(--primary-red-subtle)' : 'transparent',
+          color: 'var(--primary-red)',
+          boxShadow: 'inset 0 0 0 2px var(--primary-red)',
+        };
+      case 'ghost':
+        return {
+          backgroundColor: isHovered ? 'var(--bg-surface-hover)' : 'transparent',
+          color: 'var(--text-main)',
+        };
+      case 'danger':
+        return {
+          backgroundColor: isHovered ? 'var(--status-danger)' : 'var(--status-danger-bg)',
+          color: isHovered ? '#ffffff' : 'var(--status-danger)',
+          boxShadow: 'inset 0 0 0 1px var(--status-danger)',
+        };
+      default:
+        return {};
+    }
   };
 
   return (
@@ -75,13 +89,21 @@ export const Button: React.FC<ButtonProps> = ({
       style={{
         ...baseStyle,
         ...sizeStyles[size],
-        ...variantStyles[variant],
+        ...getVariantStyles(),
         ...style,
       }}
       disabled={disabled || isLoading}
+      onMouseEnter={(e) => {
+        setIsHovered(true);
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={(e) => {
+        setIsHovered(false);
+        onMouseLeave?.(e);
+      }}
       {...props}
     >
-      {isLoading ? <Loader2 size={16} className="animate-spin" /> : leftIcon}
+      {isLoading ? <Loader2 size={15} className="animate-spin" /> : leftIcon}
       {children}
       {!isLoading && rightIcon}
     </button>

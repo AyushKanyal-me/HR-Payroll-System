@@ -53,8 +53,8 @@ export const Modal: React.FC<ModalProps> = ({
         alignItems: 'center',
         justifyContent: 'center',
         padding: '20px',
-        backgroundColor: 'rgba(0, 0, 0, 0.85)',
-        backdropFilter: 'blur(8px)',
+        backgroundColor: 'rgba(0, 0, 0, 0.65)',
+        backdropFilter: 'blur(4px)',
       }}
       onClick={onClose}
     >
@@ -64,36 +64,45 @@ export const Modal: React.FC<ModalProps> = ({
           width: '100%',
           maxWidth: maxWidth,
           maxHeight: 'calc(100vh - 40px)',
-          borderRadius: '12px',
+          borderRadius: '8px',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.1)',
-          backgroundColor: '#0f0f12',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-strong)',
           overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Crimson Accent Bar */}
-        <div style={{ height: '3px', background: 'linear-gradient(90deg, #dc2626, #991b1b)', flexShrink: 0, borderRadius: '12px 12px 0 0' }} />
+        {/* Top Accent Bar */}
+        <div style={{ height: '3px', backgroundColor: 'var(--primary-red)', flexShrink: 0 }} />
 
         {/* Modal Header */}
         <div
           style={{
-            padding: '12px 20px 10px',
+            padding: '16px 24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '1px solid var(--border-subtle)',
+            backgroundColor: 'var(--bg-surface)',
             flexShrink: 0,
           }}
         >
           <div>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.2 }}>
+            <h3
+              style={{
+                fontSize: '1.15rem',
+                fontWeight: 700,
+                fontFamily: 'var(--font-heading)',
+                color: 'var(--text-main)',
+                lineHeight: 1.2,
+              }}
+            >
               {title}
             </h3>
             {subtitle && (
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '3px' }}>
                 {subtitle}
               </p>
             )}
@@ -103,16 +112,22 @@ export const Modal: React.FC<ModalProps> = ({
             style={{
               background: 'none',
               border: 'none',
-              color: 'var(--text-dim)',
+              color: 'var(--text-muted)',
               cursor: 'pointer',
-              padding: '4px',
-              borderRadius: '6px',
+              padding: '6px',
+              borderRadius: '4px',
               display: 'flex',
               alignItems: 'center',
-              transition: 'color 0.15s ease',
+              transition: 'all 0.2s ease-in-out',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#f4f4f5')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-dim)')}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--primary-red)';
+              e.currentTarget.style.backgroundColor = 'var(--primary-red-subtle)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--text-muted)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
           >
             <X size={18} />
           </button>
@@ -121,9 +136,10 @@ export const Modal: React.FC<ModalProps> = ({
         {/* Modal Body */}
         <div
           style={{
-            padding: '16px 20px',
+            padding: '20px 24px',
             overflowY: 'auto',
-            maxHeight: 'calc(100vh - 120px)',
+            maxHeight: 'calc(100vh - 140px)',
+            color: 'var(--text-main)',
           }}
         >
           {children}
@@ -133,14 +149,13 @@ export const Modal: React.FC<ModalProps> = ({
         {footer && (
           <div
             style={{
-              padding: '10px 20px',
+              padding: '14px 24px',
               borderTop: '1px solid var(--border-subtle)',
-              backgroundColor: '#0c0c0e',
+              backgroundColor: 'var(--bg-sidebar)',
               display: 'flex',
               justifyContent: 'flex-end',
               gap: '10px',
               flexShrink: 0,
-              borderRadius: '0 0 12px 12px',
             }}
           >
             {footer}

@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { useTheme } from '../../context/ThemeContext';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
-import { Banknote, Lock, Mail, ShieldAlert, ArrowRight } from 'lucide-react';
-import { DoodleCompass, DoodleHandshake } from '../../components/doodles/DoodleArt';
+import { Banknote, Lock, Mail, ArrowRight, Sun, Moon } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const toast = useToast();
 
   const [email, setEmail] = useState('');
@@ -27,7 +28,6 @@ export const Login: React.FC = () => {
     try {
       await login({ email, password });
       toast.success('Authentication Successful', 'Welcome to HR Pay 360');
-      // Auth context will redirect or trigger navigation
       navigate('/dashboard');
     } catch (err: any) {
       toast.error('Login Failed', err.message || 'Invalid credentials');
@@ -48,93 +48,105 @@ export const Login: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#09090b',
-        padding: '20px',
+        backgroundColor: 'var(--bg-app)',
+        padding: '24px',
         position: 'relative',
-        overflow: 'hidden',
+        transition: 'background-color 0.2s ease-in-out',
       }}
     >
-      {/* Background radial gradient glow */}
-      <div
+      {/* Theme toggle in top-right */}
+      <button
+        onClick={toggleTheme}
+        title={theme === 'dark' ? 'Switch to Editorial Light Mode' : 'Switch to Dark Mode'}
         style={{
           position: 'absolute',
-          width: '600px',
-          height: '600px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(9, 9, 11, 0) 70%)',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Golden Compass Doodle Backdrop */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-15px',
-          right: '-15px',
-          pointerEvents: 'none',
-          zIndex: 1,
+          top: '20px',
+          right: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '40px',
+          height: '40px',
+          borderRadius: '0.375em',
+          border: '1px solid var(--border-subtle)',
+          backgroundColor: 'var(--bg-surface)',
+          color: 'var(--text-main)',
+          cursor: 'pointer',
+          boxShadow: 'var(--card-shadow)',
+          transition: 'all 0.2s ease-in-out',
         }}
       >
-        <DoodleCompass size={300} color="#d4af37" opacity={0.6} />
-      </div>
+        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+      </button>
 
       <div
         className="glass-modal animate-fade-in"
         style={{
           width: '100%',
           maxWidth: '440px',
-          borderRadius: '16px',
-          padding: '36px 32px',
+          borderRadius: '8px',
+          padding: '40px 36px',
           position: 'relative',
           zIndex: 10,
-          overflow: 'hidden',
-          border: '1px solid rgba(212, 175, 55, 0.25)',
-          boxShadow: '0 0 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.08)',
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-strong)',
+          boxShadow: 'var(--card-shadow-hover)',
         }}
       >
-        {/* Golden Handshake Doodle watermark inside auth modal */}
+        {/* Top Accent Strip */}
         <div
           style={{
             position: 'absolute',
-            bottom: '-20px',
-            right: '-25px',
-            pointerEvents: 'none',
-            zIndex: 0,
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            backgroundColor: 'var(--primary-red)',
           }}
-        >
-          <DoodleHandshake size={200} color="#d4af37" opacity={0.55} />
-        </div>
+        />
+
         {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <div
             style={{
               width: '48px',
               height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+              borderRadius: '0.375em',
+              backgroundColor: 'var(--primary-red)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 25px rgba(220, 38, 38, 0.45)',
+              boxShadow: '0 4px 12px rgba(245, 106, 106, 0.35)',
               marginBottom: '16px',
             }}
           >
             <Banknote size={26} color="#ffffff" />
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f4f4f5', letterSpacing: '-0.03em' }}>
+          <h1
+            style={{
+              fontSize: '1.65rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--text-main)',
+              letterSpacing: '-0.01em',
+            }}
+          >
             HR Pay<span style={{ color: 'var(--primary-red)' }}> 360</span>
           </h1>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-            Enterprise HR & Deterministic Payroll
+          <p
+            style={{
+              fontSize: '0.85rem',
+              color: 'var(--text-muted)',
+              marginTop: '4px',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            Enterprise HR & Deterministic Payroll Platform
           </p>
         </div>
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <Input
             label="Work Email"
             type="email"
@@ -167,9 +179,20 @@ export const Login: React.FC = () => {
           </Button>
         </form>
 
-        {/* Quick Demo Logins for Pair Programming & Testing */}
+        {/* Quick Demo Logins */}
         <div style={{ marginTop: '28px', paddingTop: '20px', borderTop: '1px solid var(--border-subtle)' }}>
-          <div style={{ fontSize: '0.6875rem', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px', textAlign: 'center' }}>
+          <div
+            style={{
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--text-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              marginBottom: '10px',
+              textAlign: 'center',
+            }}
+          >
             Demo Quick-Fill Accounts
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
@@ -177,14 +200,25 @@ export const Login: React.FC = () => {
               type="button"
               onClick={() => setDemoCredentials('admin@example.com')}
               style={{
-                padding: '6px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#161619',
+                padding: '8px 10px',
+                borderRadius: '0.375em',
+                backgroundColor: 'var(--bg-sidebar)',
                 border: '1px solid var(--border-subtle)',
-                color: 'var(--text-muted)',
+                color: 'var(--text-main)',
                 fontSize: '0.75rem',
+                fontWeight: 600,
+                fontFamily: 'var(--font-sans)',
                 cursor: 'pointer',
                 textAlign: 'center',
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--primary-red)';
+                e.currentTarget.style.color = 'var(--primary-red)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                e.currentTarget.style.color = 'var(--text-main)';
               }}
             >
               Admin
@@ -193,14 +227,25 @@ export const Login: React.FC = () => {
               type="button"
               onClick={() => setDemoCredentials('hr.manager@example.com')}
               style={{
-                padding: '6px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#161619',
+                padding: '8px 10px',
+                borderRadius: '0.375em',
+                backgroundColor: 'var(--bg-sidebar)',
                 border: '1px solid var(--border-subtle)',
-                color: 'var(--text-muted)',
+                color: 'var(--text-main)',
                 fontSize: '0.75rem',
+                fontWeight: 600,
+                fontFamily: 'var(--font-sans)',
                 cursor: 'pointer',
                 textAlign: 'center',
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--primary-red)';
+                e.currentTarget.style.color = 'var(--primary-red)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                e.currentTarget.style.color = 'var(--text-main)';
               }}
             >
               HR Manager
@@ -209,14 +254,25 @@ export const Login: React.FC = () => {
               type="button"
               onClick={() => setDemoCredentials('payroll@example.com')}
               style={{
-                padding: '6px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#161619',
+                padding: '8px 10px',
+                borderRadius: '0.375em',
+                backgroundColor: 'var(--bg-sidebar)',
                 border: '1px solid var(--border-subtle)',
-                color: 'var(--text-muted)',
+                color: 'var(--text-main)',
                 fontSize: '0.75rem',
+                fontWeight: 600,
+                fontFamily: 'var(--font-sans)',
                 cursor: 'pointer',
                 textAlign: 'center',
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--primary-red)';
+                e.currentTarget.style.color = 'var(--primary-red)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                e.currentTarget.style.color = 'var(--text-main)';
               }}
             >
               Payroll Manager
@@ -225,14 +281,25 @@ export const Login: React.FC = () => {
               type="button"
               onClick={() => setDemoCredentials('employee@example.com')}
               style={{
-                padding: '6px 8px',
-                borderRadius: '6px',
-                backgroundColor: '#161619',
+                padding: '8px 10px',
+                borderRadius: '0.375em',
+                backgroundColor: 'var(--bg-sidebar)',
                 border: '1px solid var(--border-subtle)',
-                color: 'var(--text-muted)',
+                color: 'var(--text-main)',
                 fontSize: '0.75rem',
+                fontWeight: 600,
+                fontFamily: 'var(--font-sans)',
                 cursor: 'pointer',
                 textAlign: 'center',
+                transition: 'all 0.2s ease-in-out',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--primary-red)';
+                e.currentTarget.style.color = 'var(--primary-red)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                e.currentTarget.style.color = 'var(--text-main)';
               }}
             >
               Employee Portal

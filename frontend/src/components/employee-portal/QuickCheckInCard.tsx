@@ -5,8 +5,7 @@ import { attendanceApi } from '../../api/endpoints';
 import { AttendanceQuickStatus } from '../../types';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Clock, LogIn, LogOut, CheckCircle2 } from 'lucide-react';
-
+import { Clock, LogIn, LogOut } from 'lucide-react';
 
 export const QuickCheckInCard: React.FC = () => {
   const { user } = useAuth();
@@ -76,12 +75,12 @@ export const QuickCheckInCard: React.FC = () => {
         overflow: 'hidden',
       }}
     >
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #dc2626, #991b1b)' }} />
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', backgroundColor: 'var(--primary-red)' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Clock size={18} color="var(--primary-red)" />
-          <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Work Shift & Punch</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-main)' }}>Work Shift & Punch</h3>
         </div>
         <Badge
           status={isWorking ? 'PRESENT' : isFinished ? 'COMPUTED' : 'DRAFT'}
@@ -91,20 +90,20 @@ export const QuickCheckInCard: React.FC = () => {
       </div>
 
       {/* Clock display */}
-      <div style={{ textAlign: 'center', padding: '16px 0', backgroundColor: '#161619', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
-        <div style={{ fontSize: '2.25rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#ffffff', letterSpacing: '-0.02em' }}>
+      <div style={{ textAlign: 'center', padding: '18px 0', backgroundColor: 'var(--bg-sidebar)', borderRadius: '0.375em', border: '1px solid var(--border-subtle)' }}>
+        <div style={{ fontSize: '2.25rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
           {currentTime.toLocaleTimeString()}
         </div>
-        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+        <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: '4px', fontFamily: 'var(--font-sans)' }}>
           {currentTime.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </div>
       </div>
 
       {/* Check In / Out Stats */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
-        <div style={{ padding: '12px', backgroundColor: '#141416', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>First In</div>
-          <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: status?.check_in ? '#f4f4f5' : 'var(--text-dim)', marginTop: '2px' }}>
+        <div style={{ padding: '12px', backgroundColor: 'var(--bg-sidebar)', borderRadius: '0.375em', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>First In</div>
+          <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: status?.check_in ? 'var(--text-main)' : 'var(--text-dim)', marginTop: '2px' }}>
             {status?.sessions && status.sessions.length > 0
               ? new Date(status.sessions[0].check_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               : status?.check_in
@@ -112,14 +111,14 @@ export const QuickCheckInCard: React.FC = () => {
               : '—'}
           </div>
         </div>
-        <div style={{ padding: '12px', backgroundColor: '#141416', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Last Out</div>
-          <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: status?.check_out ? '#f4f4f5' : 'var(--text-dim)', marginTop: '2px' }}>
+        <div style={{ padding: '12px', backgroundColor: 'var(--bg-sidebar)', borderRadius: '0.375em', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>Last Out</div>
+          <div style={{ fontSize: '0.9375rem', fontWeight: 600, color: status?.check_out ? 'var(--text-main)' : 'var(--text-dim)', marginTop: '2px' }}>
             {status?.check_out ? new Date(status.check_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—'}
           </div>
         </div>
-        <div style={{ padding: '12px', backgroundColor: '#141416', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Total Worked</div>
+        <div style={{ padding: '12px', backgroundColor: 'var(--bg-sidebar)', borderRadius: '0.375em', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, fontFamily: 'var(--font-heading)' }}>Total Worked</div>
           <div style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--primary-red)', marginTop: '2px' }}>
             {status?.worked_hours ? `${status.worked_hours} hrs` : isWorking ? `${(status?.elapsed_minutes ? (status.elapsed_minutes / 60).toFixed(1) : '0.1')} hrs` : '0.0 hrs'}
           </div>
@@ -128,8 +127,8 @@ export const QuickCheckInCard: React.FC = () => {
 
       {/* Multi-punch sessions timeline */}
       {status?.sessions && status.sessions.length > 0 && (
-        <div style={{ backgroundColor: '#121215', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>
+        <div style={{ backgroundColor: 'var(--bg-sidebar)', padding: '12px 14px', borderRadius: '0.375em', border: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' }}>
             Today's Punch Intervals ({status.sessions.length})
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '120px', overflowY: 'auto' }}>
@@ -146,15 +145,15 @@ export const QuickCheckInCard: React.FC = () => {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     fontSize: '0.8125rem',
-                    padding: '4px 8px',
-                    backgroundColor: '#18181b',
-                    borderRadius: '5px',
-                    border: '1px solid rgba(255,255,255,0.05)',
+                    padding: '6px 10px',
+                    backgroundColor: 'var(--bg-surface)',
+                    borderRadius: '4px',
+                    border: '1px solid var(--border-subtle)',
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '0.7rem', color: 'var(--primary-red)', fontWeight: 700 }}>#{idx + 1}</span>
-                    <span style={{ color: '#f4f4f5' }}>{inTime} – {outTime}</span>
+                    <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{inTime} – {outTime}</span>
                   </div>
                   <span style={{ fontSize: '0.75rem', color: sess.check_out ? 'var(--text-muted)' : 'var(--status-success)', fontWeight: 600 }}>
                     {sess.check_out ? `${sess.duration_hours || 0} hrs` : 'Active'}

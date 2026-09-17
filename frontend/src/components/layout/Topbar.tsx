@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import { useTheme } from '../../context/ThemeContext';
 import { attendanceApi } from '../../api/endpoints';
 import { AttendanceQuickStatus } from '../../types';
-import { Search, Clock, LogIn, LogOut, ShieldCheck } from 'lucide-react';
+import { Search, LogIn, LogOut, ShieldCheck, Sun, Moon } from 'lucide-react';
 import { Button } from '../ui/Button';
 
 export const Topbar: React.FC = () => {
   const { user, isEmployeeOnly } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const toast = useToast();
   const [quickStatus, setQuickStatus] = useState<AttendanceQuickStatus | null>(null);
   const [isPunching, setIsPunching] = useState(false);
@@ -53,8 +55,7 @@ export const Topbar: React.FC = () => {
     <header
       style={{
         height: '64px',
-        backgroundColor: 'rgba(18, 18, 20, 0.8)',
-        backdropFilter: 'blur(12px)',
+        backgroundColor: 'var(--bg-surface)',
         borderBottom: '1px solid var(--border-subtle)',
         display: 'flex',
         alignItems: 'center',
@@ -63,6 +64,7 @@ export const Topbar: React.FC = () => {
         position: 'sticky',
         top: 0,
         zIndex: 20,
+        transition: 'background-color 0.2s ease-in-out, border-color 0.2s ease-in-out',
       }}
     >
       {/* Search Input (Hidden for Employee Portal) */}
@@ -76,7 +78,7 @@ export const Topbar: React.FC = () => {
                 left: '12px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: 'var(--text-dim)',
+                color: 'var(--text-muted)',
               }}
             />
             <input
@@ -84,14 +86,21 @@ export const Topbar: React.FC = () => {
               placeholder="Search employees, contracts, payruns..."
               style={{
                 width: '100%',
-                backgroundColor: '#141416',
+                backgroundColor: 'var(--bg-input)',
                 border: '1px solid var(--border-subtle)',
-                borderRadius: '8px',
+                borderRadius: '0.375em',
                 padding: '8px 12px 8px 36px',
                 fontSize: '0.8125rem',
                 color: 'var(--text-main)',
                 outline: 'none',
                 fontFamily: 'var(--font-sans)',
+                transition: 'border-color 0.2s ease-in-out',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = 'var(--primary-red)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-subtle)';
               }}
             />
           </div>
@@ -101,7 +110,36 @@ export const Topbar: React.FC = () => {
       )}
 
       {/* Right Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+        {/* Dark / Light Mode Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to Editorial Light Mode' : 'Switch to Dark Mode'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '36px',
+            height: '36px',
+            borderRadius: '0.375em',
+            border: '1px solid var(--border-subtle)',
+            backgroundColor: 'var(--bg-surface-hover)',
+            color: 'var(--text-main)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease-in-out',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--primary-red)';
+            e.currentTarget.style.color = 'var(--primary-red)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border-subtle)';
+            e.currentTarget.style.color = 'var(--text-main)';
+          }}
+        >
+          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+        </button>
+
         {/* Quick Punch Button (if linked to an employee) */}
         {user?.employeeId && (
           <Button
@@ -121,11 +159,12 @@ export const Topbar: React.FC = () => {
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            padding: '6px 12px',
-            borderRadius: '9999px',
-            backgroundColor: '#18181b',
+            padding: '6px 14px',
+            borderRadius: '0.375em',
+            backgroundColor: 'var(--bg-sidebar)',
             border: '1px solid var(--border-subtle)',
             fontSize: '0.75rem',
+            fontWeight: 600,
             color: 'var(--text-muted)',
           }}
         >

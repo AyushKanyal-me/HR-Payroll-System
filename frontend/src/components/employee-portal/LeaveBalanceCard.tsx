@@ -27,7 +27,7 @@ export const LeaveBalanceCard: React.FC = () => {
     <div className="card-luxury" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <CalendarDays size={18} color="var(--primary-red)" />
-        <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Leave Balances ({new Date().getFullYear()})</h3>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-main)' }}>Leave Balances ({new Date().getFullYear()})</h3>
       </div>
 
       {isLoading ? (
@@ -50,7 +50,7 @@ export const LeaveBalanceCard: React.FC = () => {
                     {remaining} / {alloc.allocated_amount} {alloc.time_off_type?.unit.toLowerCase()} remaining
                   </span>
                 </div>
-                <div style={{ width: '100%', height: '6px', backgroundColor: '#202024', borderRadius: '9999px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '6px', backgroundColor: 'var(--bg-surface-hover)', border: '1px solid var(--border-subtle)', borderRadius: '9999px', overflow: 'hidden' }}>
                   <div
                     style={{
                       width: Math.min(percent, 100) + '%',

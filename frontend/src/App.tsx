@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Shell } from './components/layout/Shell';
 import { RoleGuard } from './components/layout/RoleGuard';
 
@@ -39,9 +40,10 @@ import { SettingsPage } from './pages/settings/SettingsPage';
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <ToastProvider>
-          <Routes>
+      <ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <Routes>
             {/* Public */}
             <Route path="/login" element={<Login />} />
             <Route path="/setup-account" element={<SetupAccount />} />
@@ -90,9 +92,10 @@ export const App: React.FC = () => {
                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
               </Route>
             </Route>
-          </Routes>
-        </ToastProvider>
-      </AuthProvider>
+            </Routes>
+          </ToastProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 };

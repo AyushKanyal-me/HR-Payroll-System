@@ -27,7 +27,6 @@ export const SetupAccount: React.FC = () => {
         if (session?.user?.email) {
           setUserEmail(session.user.email);
         } else {
-          // Listen to auth state change in case hash is being parsed
           const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
             if (session?.user?.email) {
               setUserEmail(session.user.email);
@@ -91,59 +90,67 @@ export const SetupAccount: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#09090b',
-        padding: '20px',
+        backgroundColor: 'var(--bg-app)',
+        padding: '24px',
         position: 'relative',
-        overflow: 'hidden',
+        transition: 'background-color 0.2s ease-in-out',
       }}
     >
-      {/* Background radial glow */}
-      <div
-        style={{
-          position: 'absolute',
-          width: '600px',
-          height: '600px',
-          borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(220, 38, 38, 0.12) 0%, rgba(9, 9, 11, 0) 70%)',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          pointerEvents: 'none',
-        }}
-      />
-
       <div
         className="glass-modal animate-fade-in"
         style={{
           width: '100%',
           maxWidth: '460px',
-          borderRadius: '16px',
-          padding: '36px 32px',
+          borderRadius: '8px',
+          padding: '40px 36px',
           position: 'relative',
           zIndex: 10,
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-strong)',
+          boxShadow: 'var(--card-shadow-hover)',
         }}
       >
+        {/* Top Accent Bar */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '3px',
+            backgroundColor: 'var(--primary-red)',
+          }}
+        />
+
         {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
           <div
             style={{
-              width: '52px',
-              height: '52px',
-              borderRadius: '14px',
-              background: 'linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%)',
+              width: '48px',
+              height: '48px',
+              borderRadius: '0.375em',
+              backgroundColor: 'var(--primary-red)',
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 25px rgba(220, 38, 38, 0.45)',
+              boxShadow: '0 4px 12px rgba(245, 106, 106, 0.35)',
               marginBottom: '16px',
             }}
           >
-            <Banknote size={28} color="#ffffff" />
+            <Banknote size={26} color="#ffffff" />
           </div>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f4f4f5', letterSpacing: '-0.03em' }}>
+          <h1
+            style={{
+              fontSize: '1.65rem',
+              fontWeight: 700,
+              fontFamily: 'var(--font-heading)',
+              color: 'var(--text-main)',
+              letterSpacing: '-0.01em',
+            }}
+          >
             HR Pay<span style={{ color: 'var(--primary-red)' }}> 360</span>
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '6px' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '6px', fontFamily: 'var(--font-sans)' }}>
             Welcome to the team! Set up your secure account password to access the portal.
           </p>
         </div>
@@ -152,25 +159,33 @@ export const SetupAccount: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', textAlign: 'center' }}>
             <div
               style={{
-                width: '64px',
-                height: '64px',
+                width: '60px',
+                height: '60px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(16, 185, 129, 0.15)',
-                border: '2px solid #10b981',
+                backgroundColor: 'var(--status-success-bg)',
+                border: '2px solid var(--status-success)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#10b981',
+                color: 'var(--status-success)',
               }}
             >
-              <CheckCircle2 size={36} />
+              <CheckCircle2 size={32} />
             </div>
 
             <div>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#ffffff', marginBottom: '6px' }}>
+              <h2
+                style={{
+                  fontSize: '1.25rem',
+                  fontWeight: 700,
+                  fontFamily: 'var(--font-heading)',
+                  color: 'var(--text-main)',
+                  marginBottom: '6px',
+                }}
+              >
                 Account Setup Complete!
               </h2>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 Your password is now active. You can proceed directly to your employee workspace.
               </p>
             </div>
@@ -191,18 +206,18 @@ export const SetupAccount: React.FC = () => {
               <div
                 style={{
                   padding: '12px 16px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                  borderRadius: '0.375em',
+                  backgroundColor: 'var(--bg-sidebar)',
                   border: '1px solid var(--border-subtle)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
                 }}
               >
-                <ShieldCheck size={18} style={{ color: '#10b981' }} />
+                <ShieldCheck size={18} style={{ color: 'var(--status-success)' }} />
                 <div style={{ fontSize: '0.8125rem' }}>
-                  <span style={{ color: 'var(--text-dim)' }}>Activating account for: </span>
-                  <strong style={{ color: '#ffffff' }}>{userEmail}</strong>
+                  <span style={{ color: 'var(--text-muted)' }}>Activating account for: </span>
+                  <strong style={{ color: 'var(--text-main)' }}>{userEmail}</strong>
                 </div>
               </div>
             )}
@@ -211,10 +226,10 @@ export const SetupAccount: React.FC = () => {
               <div
                 style={{
                   padding: '12px 16px',
-                  borderRadius: '10px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid #ef4444',
-                  color: '#ef4444',
+                  borderRadius: '0.375em',
+                  backgroundColor: 'var(--status-danger-bg)',
+                  border: '1px solid var(--status-danger)',
+                  color: 'var(--status-danger)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',

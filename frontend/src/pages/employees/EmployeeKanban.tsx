@@ -146,20 +146,21 @@ export const EmployeeKanban: React.FC = () => {
                       width: '42px',
                       height: '42px',
                       borderRadius: '50%',
-                      backgroundColor: 'rgba(220, 38, 38, 0.15)',
-                      border: '1px solid rgba(220, 38, 38, 0.4)',
+                      backgroundColor: 'var(--primary-red-subtle)',
+                      border: '1.5px solid var(--primary-red)',
                       color: 'var(--primary-red)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontWeight: 700,
+                      fontFamily: 'var(--font-heading)',
                       fontSize: '0.9rem',
                     }}
                   >
                     {getInitials(emp.first_name, emp.last_name)}
                   </div>
                   <div>
-                    <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--text-main)' }}>
+                    <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, fontFamily: 'var(--font-heading)', color: 'var(--text-main)' }}>
                       {emp.first_name} {emp.last_name}
                     </h3>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>

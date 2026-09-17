@@ -9,7 +9,7 @@ interface SkeletonProps {
 export const Skeleton: React.FC<SkeletonProps> = ({
   height = '16px',
   width = '100%',
-  borderRadius = '6px',
+  borderRadius = '4px',
 }) => {
   return (
     <div
@@ -18,7 +18,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
         height,
         width,
         borderRadius,
-        backgroundColor: '#202024',
+        backgroundColor: 'var(--border-subtle)',
       }}
     />
   );
