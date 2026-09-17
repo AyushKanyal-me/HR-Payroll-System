@@ -12,7 +12,16 @@ const app: Express = express();
 
 // Security and utility middlewares
 app.use(helmet());
-app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
+
+const corsOrigin = (() => {
+  if (!env.CORS_ORIGIN || env.CORS_ORIGIN === '*') {
+    return true; // Reflect origin to allow any origin with credentials: true
+  }
+  const origins = env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
+  return origins.length === 1 ? origins[0] : origins;
+})();
+
+app.use(cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(requestLogger);

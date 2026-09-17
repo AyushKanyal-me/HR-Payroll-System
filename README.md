@@ -97,12 +97,12 @@ PeoplePay360 is built with a decoupled client-server architecture:
 ## Technology Stack
 
 ### Backend
-- Runtime: Node.js (v18+)
+- Runtime: Node.js (v20+ LTS)
 - Language: TypeScript
 - Web Framework: Express.js
 - Database & Auth: Supabase (PostgreSQL with Row Level Security)
 - Validation: Zod schemas
-- Testing: Vitest, Supertest (170 automated test cases)
+- Testing: Vitest, Supertest (170 automated test cases across 15 suites)
 
 ### Frontend
 - Framework: React 18 with TypeScript
@@ -174,8 +174,8 @@ PeoplePay360-HR-Payroll/
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18.0.0 or higher)
-- npm (v9.0.0 or higher)
+- Node.js (v20.0.0 LTS or higher)
+- npm (v10.0.0 or higher)
 - Supabase Project or local PostgreSQL instance
 
 ### 1. Clone the Repository
@@ -267,10 +267,13 @@ cd backend
 npm test
 ```
 
-To run test suites with code coverage reporting:
+To run TypeScript verification:
 ```bash
-cd backend
-npm run test:coverage
+# Backend typecheck
+cd backend && npm run typecheck
+
+# Frontend typecheck
+cd frontend && npm run typecheck
 ```
 
 ---
@@ -282,3 +285,16 @@ npm run test:coverage
 - Input Validation: Strict request validation on all endpoints using Zod schema parsing.
 - Audit Trail: Immutable logging of all sensitive state transitions and administrative operations.
 - Secret Sanitization: Passwords and sensitive tokens are strictly hashed and excluded from API responses and client-side storage.
+- Vulnerability Policy: See [SECURITY.md](SECURITY.md) for vulnerability disclosure guidelines.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please review [CONTRIBUTING.md](CONTRIBUTING.md) for details on code style, testing requirements, and pull request workflows.
+
+---
+
+## License
+
+This project is open-source and licensed under the [MIT License](LICENSE). Copyright (c) 2026 Ayush Kanyal.
