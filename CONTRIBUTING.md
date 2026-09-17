@@ -1,6 +1,7 @@
 # Contributing to HR Pay 360
 
-Thank you for your interest in contributing to PeoplePay360! This document outlines our development process, standards, and guidelines.
+Thank you for your interest in contributing to HR Pay 
+360! This document outlines our development process, standards, and guidelines.
 
 ---
 
