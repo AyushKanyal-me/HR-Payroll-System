@@ -11,7 +11,7 @@ We actively maintain and provide security updates for the following versions:
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within PeoplePay360, please follow these guidelines:
+If you discover a security vulnerability within HR Pay 360, please follow these guidelines:
 
 1. **Do not create a public GitHub issue.**
 2. Send an email to `security@peoplepay360.com` or contact the repository owner directly.
