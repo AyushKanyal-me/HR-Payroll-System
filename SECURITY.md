@@ -21,4 +21,4 @@ If you discover a security vulnerability within HR Pay 360, please follow these 
    - Potential impact of the vulnerability.
 4. You will receive an acknowledgement within 48 hours, followed by a status update on triage and remediation.
 
-Thank you for helping keep PeoplePay360 and its users safe!
+Thank you for helping keep HR PayRoll and its users safe!
